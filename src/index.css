@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Class-based dark mode so theme toggle works (Tailwind v4 default is prefers-color-scheme only) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans:
+    "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  /* Airbnb-style brand red */
+  --color-brand: #ff5a5f;
+  --color-brand-hover: #e84a4f;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+html.dark body {
+  @apply bg-black text-slate-100;
+}
+
+/* Sliding partner logos marquee – seamless loop, no glitch */
+@keyframes slide-logos {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.animate-slide-logos {
+  animation: slide-logos 50s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
