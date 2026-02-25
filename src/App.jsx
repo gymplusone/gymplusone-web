@@ -317,54 +317,64 @@ function App() {
   const pricingPlans = useMemo(
     () => [
       {
-        name: "Free",
-        badge: "Most Popular for Starters",
+        name: "Free Plan",
         price: "Free",
         cadence: "",
-        description: "Basic access to connect with fitness partners",
+        description: "Full functionality with no subscription required",
         highlight: false,
         features: [
-          "Unlimited matching with fitness partners",
-          "Basic profile (limited visibility)",
-          "Join up to 3 community groups",
-          "Message matched partners",
-          "View basic post threads",
+          "Detailed profiling: voice notes, video & prompts to showcase personality",
+          "Up to 20 invites per day to find the perfect partner or trainer",
+          "Create and join up to 3 communities per month",
+          "Change location to other cities at no extra cost",
+          "Zero obligation — complete access to the core app experience",
         ],
         cta: "Get Started",
       },
       {
-        name: "Super +1",
-        badge: "For Serious Gym Partners",
-        price: "£25",
-        cadence: "per month",
-        description: "Enhanced features for serious fitness partners",
-        highlight: true,
+        name: "1 Week",
+        price: "£7.99",
+        cadence: "",
+        description: "Super +1 or Super PT for a week",
+        highlight: false,
         features: [
           "Unlimited likes and matches",
-          "1 hour daily spotlight visibility",
+          "30 minutes spotlight visibility",
           "View invitations & see invitees' profiles",
           "View full thread of other users’ posts",
           "Premium profile (increased visibility)",
-          "Priority access to new features",
         ],
         cta: "Upgrade Now",
       },
       {
-        name: "SuperPT",
-        badge: "For Personal Trainers",
-        price: "£45",
-        cadence: "per month",
-        description: "Complete toolkit for personal trainers",
+        name: "1 Month",
+        price: "£25.00",
+        cadence: "",
+        description: "Super +1 or Super PT — most popular",
+        highlight: true,
+        features: [
+          "Unlimited likes and matches",
+          "45 minutes spotlight visibility",
+          "View invitations & see invitees' profiles",
+          "View full thread of other users' posts",
+          "Premium profile (increased visibility)",
+        ],
+        cta: "Upgrade Now",
+      },
+      {
+        name: "1 Year",
+        price: "£279.00",
+        cadence: "",
+        description: "Super +1 or Super PT for a full year",
         highlight: false,
         features: [
-          "All Super +1 features",
-          "List products/services for sale",
-          "Business analytics dashboard",
-          "Track client onboarding & sessions",
-          "Unlimited community groups",
-          "Premium trainer profile",
+          "Unlimited likes and matches",
+          "1 hour per month spotlight visibility",
+          "View invitations & see invitees' profiles",
+          "View full thread of other users' posts",
+          "Premium profile (increased visibility)",
         ],
-        cta: "Get Pro Tools",
+        cta: "Upgrade Now",
       },
     ],
     [],
@@ -389,7 +399,7 @@ function App() {
     {
       question: "Is there a free version available?",
       answer:
-        "Absolutely. The Free plan gives you unlimited matching with fitness partners, basic profiles, DMs, and access to up to 3 communities.",
+        "Yes. The Free plan is the default: full app access including detailed profiling (voice, video, prompts), up to 20 invites per day, up to 3 communities per month, and no location charges. You become a Super +1 or Super PT when you have an active subscription.",
     },
     {
       question: "Can I cancel anytime?",
@@ -627,7 +637,7 @@ function Hero({ activeHeroIndex, onWaitlistClick }) {
         className="mx-auto max-w-4xl text-2xl font-medium leading-tight tracking-tight text-slate-900 md:text-[3.5rem] dark:text-slate-100"
       >
         Find the perfect gym buddy on{"  "}
-        <span className="font-semibold">Gymplusone</span> for{"  "}
+        <span className="font-semibold">Gym+1</span> for{"  "}
         <span className="relative inline-block min-w-[6ch]">
           <span className="inline-block min-h-[1.2em] overflow-hidden align-bottom bg-brand/10 rounded-md px-1 py-0.5">
             <AnimatePresence mode="wait">
@@ -890,7 +900,6 @@ function MediaSection({ onWaitlistClick }) {
 }
 
 function PricingSection({ plans, onPrimaryCtaClick }) {
-  const [billing, setBilling] = useState("monthly");
   return (
     <section
       id="pricing"
@@ -898,39 +907,16 @@ function PricingSection({ plans, onPrimaryCtaClick }) {
     >
       <div className="mb-8 sm:mb-10">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
-          Simple, transparent pricing
+          Subscription plans for +1s and PTs
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
-          No hidden fees. No surprises. Choose the plan that fits your goals,
-          upgrade anytime you want.
+          You become a Super +1 or Super PT when you have an active
+          subscription; otherwise you're on the free plan by default. No hidden
+          fees — upgrade anytime.
         </p>
-        <div className="mt-6 inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-100/80 p-1 dark:border-neutral-700 dark:bg-neutral-800/80">
-          <button
-            type="button"
-            onClick={() => setBilling("yearly")}
-            className={`rounded px-4 py-2 text-sm font-medium transition ${
-              billing === "yearly"
-                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-            }`}
-          >
-            Yearly
-          </button>
-          <button
-            type="button"
-            onClick={() => setBilling("monthly")}
-            className={`rounded px-4 py-2 text-sm font-medium transition ${
-              billing === "monthly"
-                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-            }`}
-          >
-            Monthly
-          </button>
-        </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2">
         {plans.map((plan) => (
           <motion.article
             key={plan.name}
@@ -943,6 +929,11 @@ function PricingSection({ plans, onPrimaryCtaClick }) {
             }`}
           >
             <div className="mb-4 mt-1">
+              {plan.name === "1 Month" && (
+                <span className="mb-2 inline-block rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white dark:bg-slate-900/20 dark:text-slate-800">
+                  Most popular
+                </span>
+              )}
               <h3
                 className={`text-base font-semibold sm:text-lg ${plan.highlight ? "text-white dark:text-slate-900" : "text-slate-900 dark:text-slate-50"}`}
               >
@@ -1014,13 +1005,11 @@ function PricingSection({ plans, onPrimaryCtaClick }) {
                 <span>{plan.cta}</span>
                 <span>→</span>
               </motion.button>
-              {(plan.name === "Super +1" || plan.name === "SuperPT") && (
+              {plan.name !== "Free Plan" && (
                 <p
                   className={`text-center text-xs ${plan.highlight ? "text-white/80 dark:text-slate-600" : "text-slate-500 dark:text-slate-400"}`}
                 >
-                  {plan.name === "Super +1"
-                    ? "Cancel anytime"
-                    : "Unlimited communities for trainers"}
+                  Cancel anytime
                 </p>
               )}
             </div>
