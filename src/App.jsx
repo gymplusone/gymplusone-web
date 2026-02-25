@@ -11,6 +11,7 @@ import {
   FiChevronDown,
   FiMenu,
   FiX,
+  FiGlobe,
 } from "react-icons/fi";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -35,6 +36,169 @@ const partnerLogoUrls = [
   "https://logo.clearbit.com/strava.com",
 ];
 const heroVideo = "hero.mp4";
+
+// Region/currency for pricing. Base prices are in GBP; rates are approximate.
+const PRICING_REGIONS = {
+  GBP: {
+    code: "GBP",
+    symbol: "£",
+    name: "United Kingdom",
+    rateFromGbp: 1,
+  },
+  EUR: {
+    code: "EUR",
+    symbol: "€",
+    name: "Euro (EU)",
+    rateFromGbp: 1.17,
+  },
+  USD: {
+    code: "USD",
+    symbol: "$",
+    name: "United States",
+    rateFromGbp: 1.27,
+  },
+  CAD: {
+    code: "CAD",
+    symbol: "C$",
+    name: "Canada",
+    rateFromGbp: 1.72,
+  },
+  AUD: {
+    code: "AUD",
+    symbol: "A$",
+    name: "Australia",
+    rateFromGbp: 1.93,
+  },
+  CHF: {
+    code: "CHF",
+    symbol: "CHF",
+    name: "Switzerland",
+    rateFromGbp: 1.12,
+  },
+  NGN: {
+    code: "NGN",
+    symbol: "₦",
+    name: "Nigeria",
+    rateFromGbp: 1900,
+  },
+  ZAR: {
+    code: "ZAR",
+    symbol: "R",
+    name: "South Africa",
+    rateFromGbp: 23,
+  },
+  KES: {
+    code: "KES",
+    symbol: "KSh",
+    name: "Kenya",
+    rateFromGbp: 165,
+  },
+  GHS: {
+    code: "GHS",
+    symbol: "₵",
+    name: "Ghana",
+    rateFromGbp: 16,
+  },
+  EGP: {
+    code: "EGP",
+    symbol: "E£",
+    name: "Egypt",
+    rateFromGbp: 60,
+  },
+  INR: {
+    code: "INR",
+    symbol: "₹",
+    name: "India",
+    rateFromGbp: 106,
+  },
+  AED: {
+    code: "AED",
+    symbol: "AED",
+    name: "UAE",
+    rateFromGbp: 4.67,
+  },
+  SAR: {
+    code: "SAR",
+    symbol: "SAR",
+    name: "Saudi Arabia",
+    rateFromGbp: 4.77,
+  },
+  SGD: {
+    code: "SGD",
+    symbol: "S$",
+    name: "Singapore",
+    rateFromGbp: 1.7,
+  },
+  JPY: {
+    code: "JPY",
+    symbol: "¥",
+    name: "Japan",
+    rateFromGbp: 192,
+  },
+  BRL: {
+    code: "BRL",
+    symbol: "R$",
+    name: "Brazil",
+    rateFromGbp: 6.4,
+  },
+  MXN: {
+    code: "MXN",
+    symbol: "MX$",
+    name: "Mexico",
+    rateFromGbp: 21.5,
+  },
+};
+
+// Currencies that use whole numbers (no decimals) in display.
+const NO_DECIMAL_CURRENCIES = ["NGN", "JPY", "KES", "INR", "EGP", "ZAR"];
+
+function detectPricingRegion() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (tz.startsWith("Africa/Lagos")) return "NGN";
+    if (tz.startsWith("Africa/Nairobi")) return "KES";
+    if (tz.startsWith("Africa/Johannesburg")) return "ZAR";
+    if (tz.startsWith("Africa/Accra")) return "GHS";
+    if (tz.startsWith("Africa/Cairo")) return "EGP";
+    if (tz.startsWith("Africa/")) return "NGN";
+    if (tz.startsWith("America/Toronto") || tz.startsWith("America/Vancouver")) return "CAD";
+    if (tz.startsWith("America/Sao_Paulo")) return "BRL";
+    if (tz.startsWith("America/Mexico")) return "MXN";
+    if (tz.startsWith("America/")) return "USD";
+    if (tz.startsWith("Europe/London")) return "GBP";
+    if (tz.startsWith("Europe/Zurich")) return "CHF";
+    if (tz.startsWith("Europe/")) return "EUR";
+    if (tz.startsWith("Asia/Dubai")) return "AED";
+    if (tz.startsWith("Asia/Riyadh")) return "SAR";
+    if (tz.startsWith("Asia/Singapore")) return "SGD";
+    if (tz.startsWith("Asia/Tokyo")) return "JPY";
+    if (tz.startsWith("Asia/Kolkata")) return "INR";
+    if (tz.startsWith("Asia/")) return "SGD";
+    if (tz.startsWith("Australia/")) return "AUD";
+  } catch {
+    // ignore
+  }
+  const lang = navigator.language || "";
+  if (lang.startsWith("en-GB") || lang.startsWith("en-IE")) return "GBP";
+  if (lang.startsWith("en-AU")) return "AUD";
+  if (lang.startsWith("en-CA") || lang.startsWith("fr-CA")) return "CAD";
+  if (lang.startsWith("en-IN") || lang.startsWith("hi-")) return "INR";
+  if (lang.startsWith("en-NG") || lang.includes("NG")) return "NGN";
+  if (lang.startsWith("en-ZA") || lang.startsWith("af-")) return "ZAR";
+  if (lang.startsWith("en-US") || lang.includes("US")) return "USD";
+  if (["de", "fr", "es", "it", "pt", "nl"].some((l) => lang.startsWith(l))) return "EUR";
+  return "GBP";
+}
+
+function formatPrice(gbpAmount, currencyKey) {
+  const region = PRICING_REGIONS[currencyKey] || PRICING_REGIONS.GBP;
+  const amount = gbpAmount * region.rateFromGbp;
+  const noDecimals = NO_DECIMAL_CURRENCIES.includes(currencyKey);
+  const formatted = noDecimals
+    ? Math.round(amount).toLocaleString(undefined, { maximumFractionDigits: 0 })
+    : amount.toFixed(2);
+  return `${region.symbol}${formatted}`;
+}
 
 const FLOAT_FEATURES = [
   {
@@ -295,6 +459,10 @@ function useTheme() {
 function App() {
   const { theme, toggleTheme } = useTheme();
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+  const [pricingCurrency, setPricingCurrency] = useState(() => {
+    if (typeof window === "undefined") return "GBP";
+    return detectPricingRegion();
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -318,7 +486,7 @@ function App() {
     () => [
       {
         name: "Free Plan",
-        price: "Free",
+        priceGbp: null,
         cadence: "",
         description: "Full functionality with no subscription required",
         highlight: false,
@@ -333,7 +501,7 @@ function App() {
       },
       {
         name: "1 Week",
-        price: "£7.99",
+        priceGbp: 7.99,
         cadence: "",
         description: "Super +1 or Super PT for a week",
         highlight: false,
@@ -348,7 +516,7 @@ function App() {
       },
       {
         name: "1 Month",
-        price: "£25.00",
+        priceGbp: 25,
         cadence: "",
         description: "Super +1 or Super PT — most popular",
         highlight: true,
@@ -363,7 +531,7 @@ function App() {
       },
       {
         name: "1 Year",
-        price: "£279.00",
+        priceGbp: 279,
         cadence: "",
         description: "Super +1 or Super PT for a full year",
         highlight: false,
@@ -427,6 +595,8 @@ function App() {
           <MediaSection onWaitlistClick={handleScrollToWaitlist} />
           <PricingSection
             plans={pricingPlans}
+            currency={pricingCurrency ?? "GBP"}
+            onCurrencyChange={setPricingCurrency}
             onPrimaryCtaClick={handleScrollToWaitlist}
           />
           <WaitlistSection />
@@ -899,7 +1069,22 @@ function MediaSection({ onWaitlistClick }) {
   );
 }
 
-function PricingSection({ plans, onPrimaryCtaClick }) {
+function PricingSection({ plans, currency, onCurrencyChange, onPrimaryCtaClick }) {
+  const [regionOpen, setRegionOpen] = useState(false);
+  const regionRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (regionRef.current && !regionRef.current.contains(e.target)) {
+        setRegionOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const currentRegion = PRICING_REGIONS[currency] || PRICING_REGIONS.GBP;
+
   return (
     <section
       id="pricing"
@@ -914,9 +1099,57 @@ function PricingSection({ plans, onPrimaryCtaClick }) {
           subscription; otherwise you're on the free plan by default. No hidden
           fees — upgrade anytime.
         </p>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            View prices in:
+          </span>
+          <div className="relative" ref={regionRef}>
+            <button
+              type="button"
+              onClick={() => setRegionOpen((o) => !o)}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-slate-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+            >
+              <FiGlobe className="h-4 w-4" />
+              {currentRegion.name} ({currentRegion.symbol})
+              <FiChevronDown
+                className={`h-4 w-4 transition ${regionOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            <AnimatePresence>
+              {regionOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-0 top-full z-10 mt-1 max-h-[min(60vh,320px)] min-w-[200px] overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                  {Object.entries(PRICING_REGIONS).map(([code, region]) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => {
+                        onCurrencyChange(code);
+                        setRegionOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition ${
+                        currency === code
+                          ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+                          : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-neutral-700"
+                      }`}
+                    >
+                      <span className="text-base">{region.symbol}</span>
+                      {region.name}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => (
           <motion.article
             key={plan.name}
@@ -950,7 +1183,9 @@ function PricingSection({ plans, onPrimaryCtaClick }) {
               className={`mb-4 flex items-baseline gap-1 ${plan.highlight ? "text-white dark:text-slate-900" : "text-slate-900 dark:text-slate-50"}`}
             >
               <span className="text-2xl font-bold sm:text-3xl">
-                {plan.price}
+                {plan.priceGbp == null
+                  ? "Free"
+                  : formatPrice(plan.priceGbp, currency)}
               </span>
               {plan.cadence && (
                 <span
