@@ -161,7 +161,8 @@ function detectPricingRegion() {
     if (tz.startsWith("Africa/Accra")) return "GHS";
     if (tz.startsWith("Africa/Cairo")) return "EGP";
     if (tz.startsWith("Africa/")) return "NGN";
-    if (tz.startsWith("America/Toronto") || tz.startsWith("America/Vancouver")) return "CAD";
+    if (tz.startsWith("America/Toronto") || tz.startsWith("America/Vancouver"))
+      return "CAD";
     if (tz.startsWith("America/Sao_Paulo")) return "BRL";
     if (tz.startsWith("America/Mexico")) return "MXN";
     if (tz.startsWith("America/")) return "USD";
@@ -186,7 +187,8 @@ function detectPricingRegion() {
   if (lang.startsWith("en-NG") || lang.includes("NG")) return "NGN";
   if (lang.startsWith("en-ZA") || lang.startsWith("af-")) return "ZAR";
   if (lang.startsWith("en-US") || lang.includes("US")) return "USD";
-  if (["de", "fr", "es", "it", "pt", "nl"].some((l) => lang.startsWith(l))) return "EUR";
+  if (["de", "fr", "es", "it", "pt", "nl"].some((l) => lang.startsWith(l)))
+    return "EUR";
   return "GBP";
 }
 
@@ -482,69 +484,153 @@ function App() {
     scrollToSection("waitlist");
   };
 
-  const pricingPlans = useMemo(
-    () => [
-      {
-        name: "Free Plan",
-        priceGbp: null,
-        cadence: "",
-        description: "Full functionality with no subscription required",
-        highlight: false,
-        features: [
-          "Detailed profiling: voice notes, video & prompts to showcase personality",
-          "Up to 20 invites per day to find the perfect partner or trainer",
-          "Create and join up to 3 communities per month",
-          "Change location to other cities at no extra cost",
-          "Zero obligation — complete access to the core app experience",
-        ],
-        cta: "Get Started",
-      },
-      {
-        name: "1 Week",
-        priceGbp: 7.99,
-        cadence: "",
-        description: "Super +1 or Super PT for a week",
-        highlight: false,
-        features: [
-          "Unlimited likes and matches",
-          "30 minutes spotlight visibility",
-          "View invitations & see invitees' profiles",
-          "View full thread of other users’ posts",
-          "Premium profile (increased visibility)",
-        ],
-        cta: "Upgrade Now",
-      },
-      {
-        name: "1 Month",
-        priceGbp: 25,
-        cadence: "",
-        description: "Super +1 or Super PT — most popular",
-        highlight: true,
-        features: [
-          "Unlimited likes and matches",
-          "45 minutes spotlight visibility",
-          "View invitations & see invitees' profiles",
-          "View full thread of other users' posts",
-          "Premium profile (increased visibility)",
-        ],
-        cta: "Upgrade Now",
-      },
-      {
-        name: "1 Year",
-        priceGbp: 279,
-        cadence: "",
-        description: "Super +1 or Super PT for a full year",
-        highlight: false,
-        features: [
-          "Unlimited likes and matches",
-          "1 hour per month spotlight visibility",
-          "View invitations & see invitees' profiles",
-          "View full thread of other users' posts",
-          "Premium profile (increased visibility)",
-        ],
-        cta: "Upgrade Now",
-      },
-    ],
+  const pricingPlansByBilling = useMemo(
+    () => ({
+      weekly: [
+        {
+          name: "Free Plan",
+          priceGbp: null,
+          cadence: "",
+          description: "Basic access to connect with fitness partners",
+          highlight: false,
+          features: [
+            "Detailed profiling: voice notes, video & prompts to showcase personality",
+            "Up to 20 invites per day to find the perfect partner or trainer",
+            "Create and join up to 3 communities per month",
+            "Change location to other cities at no extra cost",
+            "Zero obligation complete access to the core app experience",
+          ],
+          cta: "Get Started",
+        },
+        {
+          name: "Super +1",
+          priceGbp: 7.99,
+          cadence: "per week",
+          description: "Enhanced features for serious fitness partners",
+          highlight: false,
+          features: [
+            "Unlimited likes and matches",
+            "1 hour daily spotlight visibility",
+            "View invitations & see invitees' profiles",
+            "View full thread of other users' posts",
+            "Premium profile (increased visibility)",
+          ],
+          cta: "Upgrade Now",
+        },
+        {
+          name: "SuperPT",
+          priceGbp: 11.99,
+          cadence: "per week",
+          description: "Complete toolkit for personal trainers",
+          highlight: false,
+          features: [
+            "All Super +1 features",
+            "List products/services for sale",
+            "Business analytics dashboard",
+            "Track client onboarding & sessions",
+            "Unlimited community groups",
+            "Premium trainer profile",
+          ],
+          cta: "Upgrade Now",
+        },
+      ],
+      monthly: [
+        {
+          name: "Free Plan",
+          priceGbp: null,
+          cadence: "",
+          description: "Basic access to connect with fitness partners",
+          highlight: false,
+          features: [
+            "Detailed profiling: voice notes, video & prompts to showcase personality",
+            "Up to 20 invites per day to find the perfect partner or trainer",
+            "Create and join up to 3 communities per month",
+            "Change location to other cities at no extra cost",
+            "Zero obligation complete access to the core app experience",
+          ],
+          cta: "Get Started",
+        },
+        {
+          name: "Super +1",
+          priceGbp: 25,
+          cadence: "per month",
+          description: "Enhanced features for serious fitness partners",
+          highlight: true,
+          features: [
+            "Unlimited likes and matches",
+            "45 minutes spotlight visibility",
+            "View invitations & see invitees' profiles",
+            "View full thread of other users' posts",
+            "Premium profile (increased visibility)",
+          ],
+          cta: "Upgrade Now",
+        },
+        {
+          name: "SuperPT",
+          priceGbp: 45,
+          cadence: "per month",
+          description: "Complete toolkit for personal trainers",
+          highlight: false,
+          features: [
+            "All Super +1 features",
+            "List products/services for sale",
+            "Business analytics dashboard",
+            "Track client onboarding & sessions",
+            "Unlimited community groups",
+            "Premium trainer profile",
+          ],
+          cta: "Upgrade Now",
+        },
+      ],
+      yearly: [
+        {
+          name: "Free Plan",
+          priceGbp: null,
+          cadence: "",
+          description: "Basic access to connect with fitness partners",
+          highlight: false,
+          features: [
+            "Detailed profiling: voice notes, video & prompts to showcase personality",
+            "Up to 20 invites per day to find the perfect partner or trainer",
+            "Create and join up to 3 communities per month",
+            "Change location to other cities at no extra cost",
+            "Zero obligation complete access to the core app experience",
+          ],
+          cta: "Get Started",
+        },
+        {
+          name: "Super +1",
+          priceGbp: 279,
+          cadence: "per year",
+          description: "Enhanced features for serious fitness partners",
+          highlight: false,
+          features: [
+            "Unlimited likes and matches",
+            "1 hour per month spotlight visibility",
+            "View invitations & see invitees' profiles",
+            "View full thread of other users' posts",
+            "Premium profile (increased visibility)",
+          ],
+          cta: "Upgrade Now",
+        },
+        {
+          name: "SuperPT",
+          priceGbp: 499,
+          cadence: "per year",
+          description: "Complete toolkit for personal trainers",
+          highlight: false,
+          features: [
+            "All Super +1 features",
+            "List products/services for sale",
+            "Business analytics dashboard",
+            "Track client onboarding & sessions",
+            "Unlimited community groups",
+            "Premium trainer profile",
+          ],
+          cta: "Upgrade Now",
+        },
+      ],
+    }),
     [],
   );
 
@@ -594,7 +680,7 @@ function App() {
           <Features />
           <MediaSection onWaitlistClick={handleScrollToWaitlist} />
           <PricingSection
-            plans={pricingPlans}
+            plansByBilling={pricingPlansByBilling}
             currency={pricingCurrency ?? "GBP"}
             onCurrencyChange={setPricingCurrency}
             onPrimaryCtaClick={handleScrollToWaitlist}
@@ -1069,7 +1155,13 @@ function MediaSection({ onWaitlistClick }) {
   );
 }
 
-function PricingSection({ plans, currency, onCurrencyChange, onPrimaryCtaClick }) {
+function PricingSection({
+  plansByBilling,
+  currency,
+  onCurrencyChange,
+  onPrimaryCtaClick,
+}) {
+  const [billing, setBilling] = useState("monthly");
   const [regionOpen, setRegionOpen] = useState(false);
   const regionRef = useRef(null);
 
@@ -1084,6 +1176,11 @@ function PricingSection({ plans, currency, onCurrencyChange, onPrimaryCtaClick }
   }, []);
 
   const currentRegion = PRICING_REGIONS[currency] || PRICING_REGIONS.GBP;
+  const plans =
+    plansByBilling[billing] ||
+    plansByBilling.monthly ||
+    plansByBilling.weekly ||
+    [];
 
   return (
     <section
@@ -1097,59 +1194,97 @@ function PricingSection({ plans, currency, onCurrencyChange, onPrimaryCtaClick }
         <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
           You become a Super +1 or Super PT when you have an active
           subscription; otherwise you're on the free plan by default. No hidden
-          fees — upgrade anytime.
+          fees upgrade anytime.
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            View prices in:
-          </span>
-          <div className="relative" ref={regionRef}>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100/70 p-1 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-800/80">
             <button
               type="button"
-              onClick={() => setRegionOpen((o) => !o)}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-slate-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+              onClick={() => setBilling("weekly")}
+              className={`rounded-full px-3 py-1 transition ${
+                billing === "weekly"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              }`}
             >
-              <FiGlobe className="h-4 w-4" />
-              {currentRegion.name} ({currentRegion.symbol})
-              <FiChevronDown
-                className={`h-4 w-4 transition ${regionOpen ? "rotate-180" : ""}`}
-              />
+              Weekly
             </button>
-            <AnimatePresence>
-              {regionOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute left-0 top-full z-10 mt-1 max-h-[min(60vh,320px)] min-w-[200px] overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
-                >
-                  {Object.entries(PRICING_REGIONS).map(([code, region]) => (
-                    <button
-                      key={code}
-                      type="button"
-                      onClick={() => {
-                        onCurrencyChange(code);
-                        setRegionOpen(false);
-                      }}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition ${
-                        currency === code
-                          ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
-                          : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-neutral-700"
-                      }`}
-                    >
-                      <span className="text-base">{region.symbol}</span>
-                      {region.name}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <button
+              type="button"
+              onClick={() => setBilling("monthly")}
+              className={`rounded-full px-3 py-1 transition ${
+                billing === "monthly"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setBilling("yearly")}
+              className={`rounded-full px-3 py-1 transition ${
+                billing === "yearly"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              }`}
+            >
+              Yearly
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              View prices in:
+            </span>
+            <div className="relative" ref={regionRef}>
+              <button
+                type="button"
+                onClick={() => setRegionOpen((o) => !o)}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-slate-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+              >
+                <FiGlobe className="h-4 w-4" />
+                {currentRegion.name} ({currentRegion.symbol})
+                <FiChevronDown
+                  className={`h-4 w-4 transition ${regionOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              <AnimatePresence>
+                {regionOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full z-10 mt-1 max-h-[min(60vh,320px)] min-w-[200px] overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+                  >
+                    {Object.entries(PRICING_REGIONS).map(([code, region]) => (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => {
+                          onCurrencyChange(code);
+                          setRegionOpen(false);
+                        }}
+                        className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition ${
+                          currency === code
+                            ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+                            : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-neutral-700"
+                        }`}
+                      >
+                        <span className="text-base">{region.symbol}</span>
+                        {region.name}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => (
           <motion.article
             key={plan.name}
@@ -1162,7 +1297,7 @@ function PricingSection({ plans, currency, onCurrencyChange, onPrimaryCtaClick }
             }`}
           >
             <div className="mb-4 mt-1">
-              {plan.name === "1 Month" && (
+              {billing === "monthly" && plan.name === "Super +1" && (
                 <span className="mb-2 inline-block rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white dark:bg-slate-900/20 dark:text-slate-800">
                   Most popular
                 </span>
