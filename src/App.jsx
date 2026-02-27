@@ -1234,8 +1234,8 @@ function PricingSection({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              View prices in:
+            <span className="text-xs hidden md:block font-medium text-slate-500 dark:text-slate-400">
+              Your Pricing Reqion:
             </span>
             <div className="relative" ref={regionRef}>
               <button
