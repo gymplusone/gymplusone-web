@@ -882,7 +882,7 @@ function Hero({ activeHeroIndex, onWaitlistClick }) {
           ))}
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          50+ Users on our Waitlist
+          175+ Users on our Waitlist
         </p>
       </motion.div>
 
@@ -1422,7 +1422,7 @@ function WaitlistSection() {
             ))}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            50+ Users on our Waitlist
+            175+ Users on our Waitlist
           </p>
         </motion.div>
       </div>
