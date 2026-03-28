@@ -7,9 +7,8 @@
   --font-sans:
     "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  /* Airbnb-style brand red */
-  --color-brand: #ff5a5f;
-  --color-brand-hover: #e84a4f;
+  --color-brand: #0001FF;
+  --color-brand-hover: #0001cc;
 }
 
 html,

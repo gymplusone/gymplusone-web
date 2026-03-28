@@ -676,7 +676,7 @@ function App() {
             activeHeroIndex={activeHeroIndex}
             onWaitlistClick={handleScrollToWaitlist}
           />
-          <SlidingPartnerLogos />
+          {/* <SlidingPartnerLogos /> */}
           <Features />
           <MediaSection onWaitlistClick={handleScrollToWaitlist} />
           <PricingSection
