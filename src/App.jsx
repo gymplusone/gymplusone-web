@@ -1146,7 +1146,7 @@ function MediaSection({ onWaitlistClick }) {
               <span className="font-semibold text-slate-900 dark:text-slate-100">
                 4.9
               </span>{" "}
-              — Average satisfaction from early testers
+              - Average satisfaction from early testers
             </p>
           </div>
         </div>
