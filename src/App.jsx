@@ -1390,6 +1390,148 @@ function PricingSection({
   );
 }
 
+function WaitlistForm() {
+  const [status, setStatus] = useState("idle");
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setStatus("loading");
+    const data = Object.fromEntries(new FormData(event.currentTarget));
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ access_key: "617e7d13-a8dd-4116-8dbf-4af355287506", ...data }),
+      });
+      const json = await res.json();
+      setStatus(json.success ? "success" : "error");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+        <span className="text-3xl">🎉</span>
+        <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">You&apos;re on the list!</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">We&apos;ll be in touch when we launch.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start lg:space-y-0"
+      onSubmit={handleSubmit}
+    >
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <label htmlFor="waitlist-name" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            Name
+          </label>
+          <input
+            id="waitlist-name"
+            name="name"
+            type="text"
+            required
+            placeholder="Alex Johnson"
+            className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="waitlist-email" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            Email
+          </label>
+          <input
+            id="waitlist-email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+            className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="waitlist-goal" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            Your primary goal
+          </label>
+          <select
+            id="waitlist-goal"
+            name="goal"
+            className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+            defaultValue="default"
+          >
+            <option value="default" disabled>Choose a goal</option>
+            <option value="lose-weight">Lose weight</option>
+            <option value="build-muscle">Build muscle</option>
+            <option value="get-stronger">Get stronger</option>
+            <option value="stay-consistent">Stay consistent</option>
+            <option value="train-for-event">Train for an event</option>
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="waitlist-role" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            I&apos;m joining as
+          </label>
+          <select
+            id="waitlist-role"
+            name="role"
+            className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+            defaultValue="partner"
+          >
+            <option value="partner">Fitness partner</option>
+            <option value="trainer">Personal trainer / coach</option>
+            <option value="community-lead">Community lead</option>
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="waitlist-message" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            Anything else you&apos;d like us to know?{" "}
+            <span className="text-slate-400">(optional)</span>
+          </label>
+          <textarea
+            id="waitlist-message"
+            name="message"
+            rows={2}
+            placeholder="Tell us about your training style, your gym, or the kind of partner you're looking for."
+            className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-slate-300 lg:space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Choose your platform
+        </p>
+        <p>
+          Download from the App Store or Play Store as soon as we launch. Join the waitlist to be first in line.
+        </p>
+        {status === "error" && (
+          <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
+        )}
+        <motion.button
+          type="submit"
+          disabled={status === "loading"}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="inline-flex w-full items-center justify-center gap-2 rounded bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+        >
+          <span>{status === "loading" ? "Submitting…" : "Join waitlist"}</span>
+          {status !== "loading" && <span>→</span>}
+        </motion.button>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Free accounts can join up to 3 groups; paid plans unlock unlimited access and advanced tools for trainers.
+        </p>
+      </div>
+    </form>
+  );
+}
+
 function WaitlistSection() {
   return (
     <section
@@ -1428,132 +1570,7 @@ function WaitlistSection() {
       </div>
 
       <div className="rounded border border-slate-200 bg-slate-50/50 p-5 dark:border-neutral-700 dark:bg-neutral-800/30 sm:p-6">
-        <form
-          className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start lg:space-y-0"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const form = event.currentTarget;
-            form.reset();
-          }}
-        >
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waitlist-name"
-                className="text-xs font-medium text-slate-700 dark:text-slate-200"
-              >
-                Name
-              </label>
-              <input
-                id="waitlist-name"
-                name="name"
-                type="text"
-                required
-                placeholder="Alex Johnson"
-                className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waitlist-email"
-                className="text-xs font-medium text-slate-700 dark:text-slate-200"
-              >
-                Email
-              </label>
-              <input
-                id="waitlist-email"
-                name="email"
-                type="email"
-                required
-                placeholder="you@example.com"
-                className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waitlist-goal"
-                className="text-xs font-medium text-slate-700 dark:text-slate-200"
-              >
-                Your primary goal
-              </label>
-              <select
-                id="waitlist-goal"
-                name="goal"
-                className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100 dark:focus:border-brand/80 dark:focus:ring-brand/30"
-                defaultValue="default"
-              >
-                <option value="default" disabled>
-                  Choose a goal
-                </option>
-                <option value="lose-weight">Lose weight</option>
-                <option value="build-muscle">Build muscle</option>
-                <option value="get-stronger">Get stronger</option>
-                <option value="stay-consistent">Stay consistent</option>
-                <option value="train-for-event">Train for an event</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waitlist-role"
-                className="text-xs font-medium text-slate-700 dark:text-slate-200"
-              >
-                I&apos;m joining as
-              </label>
-              <select
-                id="waitlist-role"
-                name="role"
-                className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100 dark:focus:border-brand/80 dark:focus:ring-brand/30"
-                defaultValue="partner"
-              >
-                <option value="partner">Fitness partner</option>
-                <option value="trainer">Personal trainer / coach</option>
-                <option value="community-lead">Community lead</option>
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label
-                htmlFor="waitlist-message"
-                className="text-xs font-medium text-slate-700 dark:text-slate-200"
-              >
-                Anything else you&apos;d like us to know?{" "}
-                <span className="text-slate-400">(optional)</span>
-              </label>
-              <textarea
-                id="waitlist-message"
-                name="message"
-                rows={2}
-                placeholder="Tell us about your training style, your gym, or the kind of partner you’re looking for."
-                className="w-full rounded border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4 rounded border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600 dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-slate-300 lg:space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Choose your platform
-            </p>
-            <p>
-              Download from the App Store or Play Store as soon as we launch.
-              Join the waitlist to be first in line.
-            </p>
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-            >
-              <span>Join waitlist</span>
-              <span>→</span>
-            </motion.button>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Free accounts can join up to 3 groups; paid plans unlock unlimited
-              access and advanced tools for trainers.
-            </p>
-          </div>
-        </form>
+        <WaitlistForm />
       </div>
     </section>
   );
