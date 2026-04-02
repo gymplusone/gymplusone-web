@@ -752,7 +752,7 @@ function Navbar({ theme, onToggleTheme, onNavigate }) {
           <img
             src={gymPlusOneLogo}
             alt="Gym+1"
-            className="h-6 w-auto dark:brightness-0 dark:invert"
+            className="h-10 w-auto dark:brightness-0 dark:invert"
           />
         </div>
 
@@ -1659,7 +1659,7 @@ function Footer() {
               <img
                 src={gymPlusOneLogo}
                 alt="Gym+1"
-                className="h-5 w-auto dark:brightness-0 dark:invert"
+                className="h-10 w-auto dark:brightness-0 dark:invert"
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
                 Find your fitness partner. Train together, stay accountable.
