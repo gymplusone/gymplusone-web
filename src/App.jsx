@@ -16,6 +16,7 @@ import {
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import "./App.css";
+import gymPlusOneLogo from "./assets/gymplusone-logo.svg";
 
 const heroLastWords = [
   "training.",
@@ -748,11 +749,11 @@ function Navbar({ theme, onToggleTheme, onNavigate }) {
     <header className="sticky top-3 z-30 mb-4 rounded-lg border border-slate-200/70 bg-white/70 px-4 py-4 sm:py-2 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/90 sm:px-8">
       <nav className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex flex-col">
-            <span className="text-xl font-semibold tracking-tight sm:text-xl">
-              Gym<span className="text-brand">+1</span>
-            </span>
-          </div>
+          <img
+            src={gymPlusOneLogo}
+            alt="Gym+1"
+            className="h-6 w-auto dark:brightness-0 dark:invert"
+          />
         </div>
 
         <div className="hidden items-center gap-6 text-xs font-medium text-slate-600 dark:text-slate-300 sm:flex sm:text-sm">
@@ -1655,9 +1656,11 @@ function Footer() {
           <div className="flex flex-col items-center gap-8 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
             {/* Brand */}
             <div className="flex flex-col items-center sm:items-start">
-              <span className="text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-xl">
-                Gym<span className="text-brand">+1</span>
-              </span>
+              <img
+                src={gymPlusOneLogo}
+                alt="Gym+1"
+                className="h-5 w-auto dark:brightness-0 dark:invert"
+              />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
                 Find your fitness partner. Train together, stay accountable.
               </p>
