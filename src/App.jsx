@@ -1456,6 +1456,19 @@ function WaitlistForm() {
         </div>
 
         <div className="space-y-1.5">
+          <label htmlFor="waitlist-phone" className="text-xs font-medium text-slate-700 dark:text-slate-200">
+            Phone number <span className="text-slate-400">(optional)</span>
+          </label>
+          <input
+            id="waitlist-phone"
+            name="phone"
+            type="tel"
+            placeholder="+1 234 567 8900"
+            className="h-10 w-full rounded border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none ring-brand/0 transition focus:border-brand/70 focus:ring-2 focus:ring-brand/30 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-50 dark:focus:border-brand/80 dark:focus:ring-brand/30"
+          />
+        </div>
+
+        <div className="space-y-1.5">
           <label htmlFor="waitlist-goal" className="text-xs font-medium text-slate-700 dark:text-slate-200">
             Your primary goal
           </label>
