@@ -29,7 +29,9 @@ export default function RootLayout() {
           <ThemedStatusBar />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
+            <Stack.Screen name="splash" />
             <Stack.Screen name="welcome" />
+            <Stack.Screen name="signup" />
             <Stack.Screen name="onboarding" />
             <Stack.Screen name="match-results" />
             <Stack.Screen name="match/[id]" />
