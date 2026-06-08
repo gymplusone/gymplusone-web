@@ -25,6 +25,7 @@ import {
   FlatList,
   type ImageSourcePropType,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -50,7 +51,6 @@ export default function MessagesListScreen() {
   const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<ChatFilter>("all");
-  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
   const threads = useMemo(() => getThreadsWithBuddy(), []);
 
@@ -78,70 +78,40 @@ export default function MessagesListScreen() {
 
   return (
     <View style={styles.container}>
-      {filterMenuOpen ? (
-        <Pressable
-          style={styles.menuBackdrop}
-          onPress={() => setFilterMenuOpen(false)}
-          accessibilityLabel="Close filter menu"
-        />
-      ) : null}
       <BlurView
         style={[styles.fixedTopWrap, { paddingTop: insets.top + spacing.md }]}
         intensity={80}
         tint={isDark ? "dark" : "light"}
         onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
       >
-        {filterMenuOpen ? (
-          <Pressable
-            style={styles.headerBackdrop}
-            onPress={() => setFilterMenuOpen(false)}
-            accessibilityLabel="Close filter menu"
-          />
-        ) : null}
         <View style={styles.header}>
-          <Text style={styles.title}>Chat</Text>
-          <View style={styles.headerRight}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Filter chats"
-              onPress={() => setFilterMenuOpen((v) => !v)}
-              hitSlop={iconButton.hitSlop}
-              style={({ pressed }) => [
-                styles.filterBtn,
-                pressed && styles.filterBtnPressed,
-              ]}
-            >
-              <FilterIcon color={colors.text} size={22} />
-            </Pressable>
-            {filterMenuOpen ? (
-              <View style={styles.filterMenu}>
-                {FILTER_OPTIONS.map((opt) => (
-                  <Pressable
-                    key={opt}
-                    onPress={() => {
-                      setSelectedFilter(opt);
-                      setFilterMenuOpen(false);
-                    }}
-                    style={({ pressed }) => [
-                      styles.filterMenuItem,
-                      selectedFilter === opt && styles.filterMenuItemSelected,
-                      pressed && styles.filterMenuItemPressed,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.filterMenuText,
-                        selectedFilter === opt && styles.filterMenuTextSelected,
-                      ]}
-                    >
-                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : null}
-          </View>
-          {/* <Text style={styles.subtitle}>Your gym buddy conversations</Text> */}
+          <Text style={styles.title}>Inbox</Text>
+        </View>
+
+        <View className="flex-row px-6 mb-3">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8 }}
+          >
+            {FILTER_OPTIONS.map((opt) => (
+              <Pressable
+                key={opt}
+                onPress={() => setSelectedFilter(opt)}
+                className={`px-4 py-1.5 rounded-full ${
+                  selectedFilter === opt ? "bg-primary" : "bg-surfaceElevated border border-border"
+                }`}
+              >
+                <Text
+                  className={`text-xs font-semibold ${
+                    selectedFilter === opt ? "text-white" : "text-textSecondary"
+                  }`}
+                >
+                  {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
 
         <View style={styles.searchWrap}>

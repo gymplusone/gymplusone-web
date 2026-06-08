@@ -2,6 +2,7 @@ import { Avatar } from "@/components/Avatar";
 import { Card } from "@/components/Card";
 import { FeedPostRow } from "@/components/feed/FeedPostRow";
 import { HomeComposer } from "@/components/feed/HomeComposer";
+import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
 import { NotificationIcon } from "@/components/icons/NotificationIcon";
 import { SettingIcon } from "@/components/icons/SettingIcon";
 import type { ThemeColors } from "@/constants/Theme";
@@ -56,6 +57,8 @@ export default function DashboardScreen() {
   const { colors, isDark } = useTheme();
   const styles = useThemedStyles((themeColors) => createStyles(themeColors, isDark), [isDark]);
   const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
+  const [superModalOpen, setSuperModalOpen] = useState(false);
+  const [spotlightModalOpen, setSpotlightModalOpen] = useState(false);
   const { onboardingData, topMatches, feedPosts, addFeedPost } = useApp();
   const notificationCount = 3;
   const name = onboardingData?.firstName ?? "there";
@@ -99,12 +102,18 @@ export default function DashboardScreen() {
               {greeting.label} {greeting.emoji}
             </Text>
             <View style={styles.headerBadgeRow}>
-              <View style={styles.headerBadge}>
+              <Pressable
+                onPress={() => setSpotlightModalOpen(true)}
+                style={styles.headerBadge}
+              >
                 <Text style={styles.headerBadgeText}>Spotlight</Text>
-              </View>
-              <View style={styles.headerBadge}>
+              </Pressable>
+              <Pressable
+                onPress={() => setSuperModalOpen(true)}
+                style={styles.headerBadge}
+              >
                 <Text style={styles.headerBadgeText}>Super +1</Text>
-              </View>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -271,6 +280,22 @@ export default function DashboardScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+      />
+      <PremiumPaymentModal
+        visible={superModalOpen}
+        mode="super"
+        onClose={() => setSuperModalOpen(false)}
+        onSuccess={(tier, price) => {
+          console.log("Upgraded to", tier, price);
+        }}
+      />
+      <PremiumPaymentModal
+        visible={spotlightModalOpen}
+        mode="spotlight"
+        onClose={() => setSpotlightModalOpen(false)}
+        onSuccess={(tier, price) => {
+          console.log("Spotlight purchased", tier, price);
+        }}
       />
     </KeyboardAvoidingView>
   );

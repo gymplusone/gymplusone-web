@@ -1,5 +1,6 @@
 import { Avatar } from "@/components/Avatar";
 import { FeedPostCommentsModal } from "@/components/feed/FeedPostCommentsModal";
+import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
 import {
   FeedPostMoreMenu,
   type FeedPostMoreMenuAnchor,
@@ -59,6 +60,7 @@ export function FeedPostRow({
     null,
   );
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [payModalOpen, setPayModalOpen] = useState(false);
   const moreHitRef = useRef<View>(null);
 
   const openMoreMenu = useCallback(() => {
@@ -209,6 +211,23 @@ export function FeedPostRow({
           </View>
         </Pressable>
       ) : null}
+      {post.isMealPlan ? (
+        <View className="mt-3 bg-surfaceElevated border border-border p-4 rounded-lg flex-row justify-between items-center">
+          <View className="flex-1 mr-4">
+            <Text className="text-text font-bold text-base">{post.planName}</Text>
+            <Text className="text-textSecondary text-xs mt-1">
+              Includes comprehensive meal guides, calorie-dense high-protein recipes, and full grocery lists.
+            </Text>
+            <Text className="text-primary font-black text-sm mt-1">{post.planPrice}</Text>
+          </View>
+          <Pressable
+            onPress={() => setPayModalOpen(true)}
+            className="bg-primary px-4 py-2.5 rounded-full justify-center items-center"
+          >
+            <Text className="text-white font-bold text-xs">Buy Now</Text>
+          </Pressable>
+        </View>
+      ) : null}
       {postDetailTimeAbsolute != null ? (
         <Text
           style={styles.postDetailTime}
@@ -317,6 +336,16 @@ export function FeedPostRow({
           </View>
         </Modal>
       ) : null}
+      <PremiumPaymentModal
+        visible={payModalOpen}
+        mode="meal_plan"
+        planName={post.planName}
+        priceLabel={post.planPrice}
+        onClose={() => setPayModalOpen(false)}
+        onSuccess={(plan, price) => {
+          console.log("Purchased", plan, price);
+        }}
+      />
     </View>
   );
 }

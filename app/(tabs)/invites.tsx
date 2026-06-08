@@ -1,6 +1,7 @@
 import { EmptyState } from "@/components/EmptyState";
 import { InviteProfileCard } from "@/components/invites/InviteProfileCard";
 import { InviteUpgradeModal } from "@/components/invites/InviteUpgradeModal";
+import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
 import type { ThemeColors } from "@/constants/Theme";
 import { spacing, typography } from "@/constants/Theme";
 import { MOCK_INVITES, type InviteProfile } from "@/data/mockInvites";
@@ -27,6 +28,7 @@ export default function InvitesScreen() {
   const [selectedInvite, setSelectedInvite] = useState<InviteProfile | null>(
     null,
   );
+  const [payModalOpen, setPayModalOpen] = useState(false);
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<InviteProfile>) => (
@@ -82,7 +84,15 @@ export default function InvitesScreen() {
         visible={selectedInvite != null}
         invite={selectedInvite}
         onClose={() => setSelectedInvite(null)}
-        onUpgrade={() => router.push("/purchased-plans")}
+        onUpgrade={() => setPayModalOpen(true)}
+      />
+      <PremiumPaymentModal
+        visible={payModalOpen}
+        mode="super"
+        onClose={() => setPayModalOpen(false)}
+        onSuccess={(tier, price) => {
+          console.log("Upgraded to", tier, price);
+        }}
       />
     </View>
   );

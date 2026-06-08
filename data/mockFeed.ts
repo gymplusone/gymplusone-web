@@ -16,6 +16,21 @@ const now = Date.now();
 
 export const INITIAL_FEED_POSTS: FeedPost[] = [
   {
+    id: "feed-seed-meal-plan",
+    authorName: "Selena Apache",
+    authorHandle: handleFromName("Selena Apache"),
+    authorInitial: "S",
+    authorVerified: true,
+    body: "Hey, check out my latest Muscle Building Meal Plan! Designed to increase muscle mass with calorie-dense, high-protein recipes. Tap Buy Now below to unlock the full guide and recipes.",
+    createdAt: now - 10 * 60 * 1000,
+    likesCount: 42,
+    commentsCount: 15,
+    image: FEED_IMG_3,
+    isMealPlan: true,
+    planPrice: "£19.99",
+    planName: "Muscle Building Plan",
+  },
+  {
     id: "feed-seed-1",
     authorName: "Jordan",
     authorHandle: handleFromName("Jordan"),

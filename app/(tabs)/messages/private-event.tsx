@@ -17,6 +17,7 @@ import { useMemo, useState } from "react";
 import {
   Alert,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -57,6 +58,7 @@ export default function PrivateEventScreen() {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   });
+  const [successOpen, setSuccessOpen] = useState(false);
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
 
@@ -368,11 +370,40 @@ export default function PrivateEventScreen() {
       <ScreenFooterBar insets={insets}>
         <Button
           title="Create Now"
-          onPress={() => router.back()}
+          onPress={() => setSuccessOpen(true)}
           fullWidth
           style={{ borderRadius: radius.full, paddingVertical: spacing.xs }}
         />
       </ScreenFooterBar>
+      <Modal
+        visible={successOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessOpen(false)}
+      >
+        <View className="flex-1 bg-black/60 justify-center items-center px-6">
+          <View className="bg-surface border border-border p-6 rounded-xl w-full max-w-[340px] items-center">
+            <View className="bg-primary/10 p-4 rounded-full mb-4 items-center justify-center">
+              <Ionicons name="checkmark-circle" size={48} className="text-primary" />
+            </View>
+            <Text className="text-text font-black text-lg text-center mb-2">
+              You've successfully created an Event!
+            </Text>
+            <Text className="text-textSecondary text-xs text-center mb-6 leading-5">
+              Review event details and manage invitees directly in your calendar tab.
+            </Text>
+            <Pressable
+              onPress={() => {
+                setSuccessOpen(false);
+                router.replace("/(tabs)/calendar");
+              }}
+              className="bg-primary py-3 rounded-full w-full items-center justify-center"
+            >
+              <Text className="text-white font-bold text-sm">View Event</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

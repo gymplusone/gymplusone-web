@@ -125,6 +125,9 @@ export interface FeedPost {
   imagePremium?: boolean;
   /** True when created from the signed-in user’s composer */
   isFromCurrentUser?: boolean;
+  isMealPlan?: boolean;
+  planPrice?: string;
+  planName?: string;
 }
 
 export interface FeedComment {

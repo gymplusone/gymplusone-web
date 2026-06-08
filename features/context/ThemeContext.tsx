@@ -4,6 +4,7 @@ import {
   type ThemeColors,
 } from "@/constants/Theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useColorScheme as useNativeWindColorScheme } from "nativewind";
 import React, {
   createContext,
   useCallback,
@@ -31,6 +32,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>("light");
   const [themeReady, setThemeReady] = useState(false);
+  const { setColorScheme: setNWColorScheme } = useNativeWindColorScheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -39,6 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (!cancelled && (stored === "light" || stored === "dark")) {
           setColorSchemeState(stored);
+          setNWColorScheme(stored);
         }
       } finally {
         if (!cancelled) setThemeReady(true);
@@ -47,12 +50,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [setNWColorScheme]);
 
   const setColorScheme = useCallback((scheme: ColorScheme) => {
     setColorSchemeState(scheme);
+    setNWColorScheme(scheme);
     void AsyncStorage.setItem(STORAGE_KEY, scheme);
-  }, []);
+  }, [setNWColorScheme]);
 
   const colors = colorScheme === "dark" ? darkColors : lightColors;
 
