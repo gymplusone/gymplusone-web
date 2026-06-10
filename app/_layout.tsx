@@ -1,7 +1,7 @@
 import { ThemeProvider, useTheme } from "@/features/context/ThemeContext";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
@@ -51,6 +51,14 @@ export default function RootLayout() {
             />
             <Stack.Screen name="feed-post" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="spotlight/purchase"
+              options={{ presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="spotlight/confirmation"
+              options={{ presentation: "modal" }}
+            />
             <Stack.Screen
               name="request-success"
               options={{ presentation: "modal" }}

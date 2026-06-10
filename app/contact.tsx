@@ -6,14 +6,7 @@ import { useThemedStyles } from "@/hooks/useThemedStyles";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CONTACT_OPTIONS = [
@@ -29,13 +22,12 @@ export default function ContactScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
 
-  const onOptionPress = useCallback((label: string) => {
-    Alert.alert(
-      label,
-      "Support messaging isn’t wired up in this build yet. For demo, this confirms the topic you chose.",
-      [{ text: "OK" }],
-    );
-  }, []);
+  const onOptionPress = useCallback(
+    (id: string) => {
+      router.push(`/contact/${id}`);
+    },
+    [router],
+  );
 
   return (
     <View style={styles.screen}>
@@ -62,7 +54,7 @@ export default function ContactScreen() {
               key={opt.id}
               accessibilityRole="button"
               accessibilityLabel={opt.label}
-              onPress={() => onOptionPress(opt.label)}
+              onPress={() => onOptionPress(opt.id)}
               style={({ pressed }) => [
                 styles.row,
                 pressed && styles.rowPressed,
