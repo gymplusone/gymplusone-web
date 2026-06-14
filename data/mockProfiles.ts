@@ -13,7 +13,6 @@ export type Profile = {
   workoutPlansImage: string;
   weightLossImage: string;
 };
-
 export const mockProfiles: Profile[] = [
   {
     id: "1",
