@@ -18,10 +18,24 @@ function ThemedStatusBar() {
   return <StatusBar style={isDark ? "light" : "dark"} />;
 }
 
+import { useFonts } from "expo-font";
+import { Manrope_400Regular } from "@expo-google-fonts/manrope";
+
 export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    Manrope_400Regular,
+    Author: require("../assets/fonts/Author.ttf"),
+  });
+
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -47,6 +61,10 @@ export default function RootLayout() {
             <Stack.Screen name="sessions" />
             <Stack.Screen
               name="payment-success"
+              options={{ presentation: "modal" }}
+            />
+            <Stack.Screen
+              name="match-modal"
               options={{ presentation: "modal" }}
             />
             <Stack.Screen name="feed-post" />

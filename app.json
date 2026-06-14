@@ -16,7 +16,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.gymplusone.gymplusone",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people."
       }
     },
     "android": {
@@ -28,7 +30,9 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ]
     },
     "web": {
@@ -45,7 +49,20 @@
           "photosPermission": "Allow Gym+1 to access your photos to attach images to community posts."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.8.0",
+          "RNMapboxMapsDownloadToken": "REPLACE_WITH_YOUR_MAPBOX_SECRET_TOKEN"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Gym+1 to use Face ID to log you in."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

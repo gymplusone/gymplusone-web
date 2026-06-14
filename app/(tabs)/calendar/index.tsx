@@ -12,15 +12,12 @@ import {
   MenuDropdownModal,
   MenuDropdownSeparator,
 } from "@/components/layout/MenuDropdownModal";
-import type { ThemeColors } from "@/constants/Theme";
-import { iconButton, spacing, typography } from "@/constants/Theme";
 import { getPublicEventListItems } from "@/data/mockEvents";
 import { useTheme } from "@/features/context/ThemeContext";
-import { useThemedStyles } from "@/hooks/useThemedStyles";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const NEARBY_EVENTS = getPublicEventListItems();
@@ -29,7 +26,6 @@ export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const styles = useThemedStyles(createStyles);
   const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
@@ -52,24 +48,46 @@ export default function CalendarScreen() {
     getCalendarPickerPanelLayout(insets.top);
 
   return (
-    <View style={styles.screen}>
+    <View className="flex-1 bg-background px-4 font-manrope">
       <BlurView
-        style={[styles.fixedTopWrap, { paddingTop: insets.top + spacing.md }]}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          paddingTop: insets.top + 16,
+          paddingHorizontal: 16,
+          borderBottomWidth: 0.5,
+          borderBottomColor: colors.borderLight,
+          overflow: "hidden",
+        }}
         intensity={80}
         tint={isDark ? "dark" : "light"}
         onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
       >
-        <View style={styles.headerRow}>
-          <Text style={styles.title} numberOfLines={1}>
-            Events near you
-          </Text>
-          <View style={styles.headerActions}>
+        {/* Profile and Quick Actions Row */}
+        <View className="flex-row items-center justify-between mb-4">
+          <View className="flex-row items-center gap-2">
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" }}
+              style={{ width: 48, height: 48, borderRadius: 24 }}
+              className="bg-gray-300"
+            />
+            <View>
+              <Text className="text-sm text-textSecondary font-manrope" style={{ fontFamily: "manrope" }}>
+                Hello Jennie
+              </Text>
+              <Text className="text-lg font-bold text-[#000000] font-manrope" style={{ fontFamily: "manrope" }}>
+                Good Morning🌤️
+              </Text>
+            </View>
+          </View>
+          
+          <View className="flex-row items-center gap-1">
             <Pressable
-              hitSlop={iconButton.hitSlop}
-              style={({ pressed }) => [
-                styles.headerIconBtn,
-                pressed && styles.headerIconPressed,
-              ]}
+              hitSlop={8}
+              style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.7 : 1 }]}
               onPress={openCalendarModal}
               accessibilityLabel="Show calendar"
               accessibilityState={{ expanded: calendarModalOpen }}
@@ -77,29 +95,33 @@ export default function CalendarScreen() {
               <CalendarTabIcon color={colors.text} size={26} />
             </Pressable>
             <Pressable
-              hitSlop={iconButton.hitSlop}
-              style={({ pressed }) => [
-                styles.headerIconBtn,
-                pressed && styles.headerIconPressed,
-              ]}
+              hitSlop={8}
+              style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.7 : 1 }]}
               onPress={() => setCreateMenuOpen((o) => !o)}
-              accessibilityLabel="Create event"
+              accessibilityLabel="Show create options"
               accessibilityState={{ expanded: createMenuOpen }}
             >
               <PlusOneTabIcon color={colors.text} size={26} />
             </Pressable>
           </View>
         </View>
-        <Text style={styles.description}>
-          People in your area are going to these events. RSVP or create your own
-          events!
+
+        {/* Section Title Heading */}
+        <View className="flex-row items-center justify-between gap-4 mb-1">
+          <Text className="flex-1 text-2xl font-bold text-text font-manrope" style={{ fontFamily: "Manrope" }}>
+            Events near you
+          </Text>
+        </View>
+        
+        <Text className="text-textSecondary text-sm leading-5 mb-4 font-manrope" style={{ fontFamily: "Manrope" }}>
+          People in your area are going to these events. RSVP or create your own events!
         </Text>
       </BlurView>
 
       <MenuDropdownModal
         visible={createMenuOpen}
         onClose={closeCreateMenu}
-        panelPositionStyle={{ top: calendarPanelTop, right: spacing.lg }}
+        panelPositionStyle={{ top: calendarPanelTop + 45, right: 16 }}
       >
         <MenuDropdownItem
           label="Create community event"
@@ -130,12 +152,11 @@ export default function CalendarScreen() {
       />
 
       <ScrollView
-        style={styles.listScroll}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingTop: fixedHeaderHeight + spacing.sm },
-          { paddingBottom: insets.bottom + spacing.xl },
-        ]}
+        className="flex-1"
+        contentContainerStyle={{
+          paddingTop: fixedHeaderHeight + 8,
+          paddingBottom: insets.bottom + 16,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {NEARBY_EVENTS.map((item, index) => (
@@ -151,56 +172,4 @@ export default function CalendarScreen() {
       </ScrollView>
     </View>
   );
-}
-
-function createStyles(colors: ThemeColors) {
-  return StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.lg,
-  },
-  fixedTopWrap: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.borderLight,
-    overflow: "hidden",
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.md,
-    marginBottom: spacing.md,
-  },
-  title: {
-    ...typography.title1,
-    color: colors.text,
-    flex: 1,
-    minWidth: 0,
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    // gap: spacing.sm,
-    flexShrink: 0,
-  },
-  headerIconBtn: {
-    padding: iconButton.padding,
-  },
-  headerIconPressed: { opacity: 0.7 },
-  description: {
-    ...typography.subhead,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  listScroll: { flex: 1 },
-  listContent: { paddingBottom: spacing.md },
-  });
 }

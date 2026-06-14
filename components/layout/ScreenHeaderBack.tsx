@@ -9,9 +9,11 @@ const HEADER_SIDE_WIDTH = 42;
 
 type Props = {
   title: string;
-  onBack: () => void;
+  onBack?: () => void;
   /** `center` — title in the horizontal center (balanced slots for back). `leading` — title after back (default). */
   titleAlign?: "leading" | "center";
+  /** Optional component to render on the right side of the header */
+  rightElement?: React.ReactNode;
 };
 
 /** Screen title row with uniform ← back (Private Event pattern). */
@@ -19,6 +21,7 @@ export function ScreenHeaderBack({
   title,
   onBack,
   titleAlign = "leading",
+  rightElement,
 }: Props) {
   const insets = useSafeAreaInsets();
   const styles = useThemedStyles(createStyles);
@@ -38,7 +41,9 @@ export function ScreenHeaderBack({
               {title}
             </Text>
           </View>
-          <View style={styles.side} />
+          <View style={[styles.side, styles.sideRight]}>
+            {rightElement}
+          </View>
         </View>
       ) : (
         <View style={styles.row}>
@@ -49,6 +54,11 @@ export function ScreenHeaderBack({
           >
             {title}
           </Text>
+          {rightElement && (
+            <View style={styles.sideRight}>
+              {rightElement}
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -67,6 +77,10 @@ function createStyles(colors: ThemeColors) {
     },
     side: {
       width: HEADER_SIDE_WIDTH,
+      alignItems: "flex-start",
+    },
+    sideRight: {
+      alignItems: "flex-end",
     },
     titleCenterWrap: {
       flex: 1,
