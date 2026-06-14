@@ -45,10 +45,6 @@ export default function EventDetailScreen() {
     );
   }
 
-      </View>
-    );
-  }
-
   return (
     <View style={styles.screen}>
       <ScreenHeaderBack
@@ -130,10 +126,6 @@ function createStyles(colors: ThemeColors) {
     screen: {
       flex: 1,
       backgroundColor: colors.background,
-    },
-    hero: {
-      height: EVENT_HERO_HEIGHT,
-      width: "100%",
     },
     hero: {
       height: EVENT_HERO_HEIGHT,
