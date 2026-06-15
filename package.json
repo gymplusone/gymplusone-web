@@ -33,7 +33,7 @@
     "expo-store-review": "~55.0.13",
     "expo-symbols": "~55.0.7",
     "expo-web-browser": "~55.0.14",
-    "mapbox-gl": "^3.24.1",
+    "mapbox-gl": "^2.15.0",
     "nativewind": "^4.2.5",
     "postcss": "^8.5.15",
     "react": "19.2.0",
