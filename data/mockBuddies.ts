@@ -1,7 +1,4 @@
-/**
- * Mock gym buddy profiles for prototype
- * TODO: Replace with API fetch when backend exists
- */
+
 
 import type { GymBuddyProfile } from '@/types';
 

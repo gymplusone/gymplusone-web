@@ -17,7 +17,7 @@ import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
 
 const { width } = Dimensions.get("window");
 
-const USER_AVATAR_PLACEHOLDER = require("@/assets/images/gym/2149278038.jpg");
+const USER_AVATAR_PLACEHOLDER = require("@/assets/ellipse.png");
 
 function getTimeGreeting(): { label: string; emoji: string } {
   const h = new Date().getHours();
@@ -66,7 +66,12 @@ export default function MatchingHomeScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: 100 }]}>
       {/* Header */}
+      <View className="flex items-center mt-8 justify-center">
+        <Text className="text-4xl font-bold text-[#000000] italic font-author">Gym+1</Text>
+        <Text className="text-[10px] font-author font-normal ">Make your workout vibe</Text>
+      </View>
       <View style={styles.headerRow}>
+        
         <View style={styles.headerLeft}>
           <Image source={USER_AVATAR_PLACEHOLDER} style={styles.userAvatar} />
           <View style={styles.headerTextCol}>
@@ -93,12 +98,12 @@ export default function MatchingHomeScreen() {
         <View style={styles.headerRight}>
           <Pressable style={styles.headerIconBtn}>
             <View style={styles.headerIconWrap}>
-              <Ionicons name="notifications" size={24} color="#000" />
+              <Ionicons name="notifications" size={18} color="#fff" />
               <View style={styles.notificationBadge} />
             </View>
           </Pressable>
           <Pressable style={styles.headerIconBtn}>
-            <Ionicons name="settings-sharp" size={24} color="#000" />
+            <Ionicons name="settings-sharp" size={18} color="#fff" />
           </Pressable>
         </View>
       </View>
@@ -161,14 +166,14 @@ export default function MatchingHomeScreen() {
 
           {/* Additional Photos / Workout Plans */}
           <View style={styles.extraPhotoContainer}>
-            <Image source={{ uri: profile.workoutPlansImage }} style={styles.extraPhoto} />
+            <Image source={profile.workoutPlansImage } style={styles.extraPhoto} />
           </View>
           <Text style={styles.extraPhotoDesc}>
             I've been skydiving, I can juggle, and I've climbed Mt. Everest.
           </Text>
 
           <View style={styles.extraPhotoContainer}>
-            <Image source={{ uri: profile.weightLossImage }} style={styles.extraPhoto} />
+            <Image source={profile.weightLossImage } style={styles.extraPhoto} />
           </View>
           <Text style={styles.extraPhotoDesc}>
             Starts with a good cup of coffee, a walk in the park, and ends with a movie marathon.

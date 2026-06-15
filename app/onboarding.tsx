@@ -1,36 +1,50 @@
+
 import { useApp } from "@/features/context/AppContext";
 import type { OnboardingData } from "@/types";
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Alert,
   Image,
+  Platform,
   Pressable,
   ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RadioButton } from "react-native-paper";
 import { ImageSourcePropType } from "react-native";
 import gymIcon from "@/assets/images/icons/gym.svg";
 import { SvgProps } from "react-native-svg";
 import { Feather } from "@expo/vector-icons";
-import Svg, { Path, G } from "react-native-svg";
+import Svg, { Path } from "react-native-svg";
 
 // ─── Mapbox import (graceful fallback if native module not yet linked) ───────
 let MapboxGL: any = null;
-try {
-  MapboxGL = require("@rnmapbox/maps").default;
-  MapboxGL.setAccessToken(
-    process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? "pk.YOUR_MAPBOX_PUBLIC_TOKEN_HERE"
-  );
-} catch {
-  // Running in Expo Go without native build — map will show a fallback view
+const isExpoGo = Constants.appOwnership === "expo";
+const isWeb = Platform.OS === "web";
+
+if (!isExpoGo && !isWeb) {
+  try {
+    const mapboxModule = require("@rnmapbox/maps");
+    MapboxGL = mapboxModule.default || mapboxModule;
+    if (MapboxGL && MapboxGL.setAccessToken) {
+      MapboxGL.setAccessToken(
+        process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? "pk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtNzIyOTY1djA1aGYybHIzaXE1eG5odTcifQ.Esxl0GXlX91G4919X0bnGg"
+      );
+    }
+  } catch {
+    // Running in Expo Go without native build — map will show a fallback view
+  }
 }
+
+const hasNativeMap = MapboxGL && MapboxGL.MapView && MapboxGL.Camera && MapboxGL.PointAnnotation;
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 type StepKey =
@@ -129,13 +143,11 @@ const defaultData: OnboardingData = {
 // ─── Location marker SVG ─────────────────────────────────────────────────────
 function LocationMarker({ size = 90 }: { size?: number }) {
   return (
-    <Svg width={size} height={size * (93 / 90)} viewBox="0 0 90 93" fill="none">
-      <G opacity={0.5}>
-        <Path
-          d="M77.3251 32.7437C73.3876 14.8412 58.2751 6.78125 45.0001 6.78125C45.0001 6.78125 45.0001 6.78125 44.9626 6.78125C31.7251 6.78125 16.5751 14.8025 12.6376 32.705C8.25011 52.7 20.1001 69.6337 30.8251 80.29C34.8001 84.2425 39.9001 86.2188 45.0001 86.2188C50.1001 86.2188 55.2001 84.2425 59.1376 80.29C69.8626 69.6337 81.7126 52.7388 77.3251 32.7437ZM45.0001 52.1575C38.4751 52.1575 33.1876 46.6938 33.1876 39.9513C33.1876 33.2088 38.4751 27.745 45.0001 27.745C51.5251 27.745 56.8126 33.2088 56.8126 39.9513C56.8126 46.6938 51.5251 52.1575 45.0001 52.1575Z"
-          fill="#0001FF"
-        />
-      </G>
+    <Svg width={size} height={size * (93 / 90)} viewBox="0 0 90 93" fill="none" opacity={0.5}>
+      <Path
+        d="M77.3251 32.7437C73.3876 14.8412 58.2751 6.78125 45.0001 6.78125C45.0001 6.78125 45.0001 6.78125 44.9626 6.78125C31.7251 6.78125 16.5751 14.8025 12.6376 32.705C8.25011 52.7 20.1001 69.6337 30.8251 80.29C34.8001 84.2425 39.9001 86.2188 45.0001 86.2188C50.1001 86.2188 55.2001 84.2425 59.1376 80.29C69.8626 69.6337 81.7126 52.7388 77.3251 32.7437ZM45.0001 52.1575C38.4751 52.1575 33.1876 46.6938 33.1876 39.9513C33.1876 33.2088 38.4751 27.745 45.0001 27.745C51.5251 27.745 56.8126 33.2088 56.8126 39.9513C56.8126 46.6938 51.5251 52.1575 45.0001 52.1575Z"
+        fill="#0001FF"
+      />
     </Svg>
   );
 }
@@ -232,6 +244,48 @@ export default function OnboardingScreen() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; name: string; lat: number; lng: number }>>([]);
+
+  useEffect(() => {
+    if (locationSearch === location) {
+      return;
+    }
+
+    if (locationSearch.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? "pk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtNzIyOTY1djA1aGYybHIzaXE1eG5odTcifQ.Esxl0GXlX91G4919X0bnGg";
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationSearch)}.json?access_token=${token}&limit=5`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch locations");
+        const data = await res.json();
+        
+        if (data && data.features) {
+          const results = data.features.map((feat: any) => ({
+            id: feat.id,
+            name: feat.place_name,
+            lat: feat.center[1],
+            lng: feat.center[0],
+          }));
+          setSearchResults(results);
+        }
+      } catch (err) {
+        console.warn("Mapbox geocoding error:", err);
+        // Fallback to offline filtering of mock locations if API fails
+        const offline = MOCK_LOCATIONS.filter((loc) =>
+          loc.name.toLowerCase().includes(locationSearch.toLowerCase())
+        );
+        setSearchResults(offline);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [locationSearch, location]);
+
   const step = steps[index];
   const isLast = index === steps.length - 1;
 
@@ -259,13 +313,62 @@ export default function OnboardingScreen() {
     };
   }, [age, days, gender, goals, interests, location, time]);
 
-  const next = () => {
+  const handleLocationPermissionRequest = async () => {
+    try {
+      setValidationError(null);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setValidationError("Permission to access location was denied. Please enter it manually.");
+        setIndex((v) => v + 1);
+        return;
+      }
+
+      const locData = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const { latitude, longitude } = locData.coords;
+      setSelectedCoords({ lat: latitude, lng: longitude });
+
+      // Reverse geocode via Mapbox to find city/neighborhood
+      const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? "pk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtNzIyOTY1djA1aGYybHIzaXE1eG5odTcifQ.Esxl0GXlX91G4919X0bnGg";
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${token}&types=place,locality,neighborhood`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.features && data.features.length > 0) {
+          const placeName = data.features[0].place_name;
+          setLocation(placeName);
+          setLocationSearch(placeName);
+        } else {
+          const coordsStr = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          setLocation(coordsStr);
+          setLocationSearch(coordsStr);
+        }
+      } else {
+        const coordsStr = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        setLocation(coordsStr);
+        setLocationSearch(coordsStr);
+      }
+    } catch (err) {
+      console.warn("Location fetch/geocoding error:", err);
+      setValidationError("Failed to get location. Please type it in manually.");
+    } finally {
+      setIndex((v) => v + 1);
+    }
+  };
+
+  const next = async () => {
     const error = validateStep(step, stepState);
     if (error) {
       setValidationError(error);
       return;
     }
     setValidationError(null);
+    if (step === "locationIntro") {
+      await handleLocationPermissionRequest();
+      return;
+    }
     if (isLast) {
       completeOnboarding(completedData);
       router.replace("/(tabs)");
@@ -284,19 +387,19 @@ export default function OnboardingScreen() {
     }
   };
 
-  const pickPhotos = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-      selectionLimit: 6 - photos.length,
-    });
-    if (!result.canceled) {
-      setPhotos((curr) =>
-        [...curr, ...result.assets.map((a) => a.uri)].slice(0, 6)
-      );
-    }
-  };
+ const pickPhotos = async () => {
+ const result = await ImagePicker.launchImageLibraryAsync({
+  allowsMultipleSelection: true,
+  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  quality: 0.8,
+  selectionLimit: 6 - photos.length,
+});
+  if (!result.canceled) {
+    setPhotos((curr) =>
+      [...curr, ...result.assets.map((a) => a.uri)].slice(0, 6)
+    );
+  }
+};
 
   const removePhoto = (photoIndex: number) => {
     setPhotos((curr) => curr.filter((_, i) => i !== photoIndex));
@@ -305,6 +408,8 @@ export default function OnboardingScreen() {
   const filteredLocations = MOCK_LOCATIONS.filter((loc) =>
     loc.name.toLowerCase().includes(locationSearch.toLowerCase())
   );
+
+  const locationSuggestions = searchResults.length > 0 ? searchResults : filteredLocations;
 
   const buttonLabel = () => {
     if (step === "locationIntro") return "Allow";
@@ -524,16 +629,19 @@ export default function OnboardingScreen() {
                 Location
               </Text>
               {/* Search input */}
-              <View className="bg-white rounded-sm flex-row items-center h-11 px-3.5 gap-2 mb-2">
+              <View className="bg-white rounded-sm flex-row items-center h-11 px-3.5 gap-2 mb-2 border border-transparent focus:border-white focus:outline-none">
                 <SearchSvgIcon />
-                <TextInput
-                  value={locationSearch}
-                  onChangeText={(v) => { setLocationSearch(v); setValidationError(null); }}
-                  placeholder="Search Location..."
-                  placeholderTextColor="#999"
-                  className="flex-1 text-gray-900 font-manrope"
-                  style={{ height: 44 }}
-                />
+     <TextInput
+  value={locationSearch}
+  onChangeText={(v) => { setLocationSearch(v); setValidationError(null); }}
+  placeholder="Search Location..."
+  placeholderTextColor="#999"
+  className="flex-1 text-gray-900 border-white font-manrope focus:border-transparent focus:ring-0"
+  style={{ 
+    height: 44,
+  }}
+  underlineColorAndroid="transparent"
+/>
                 {locationSearch.length > 0 ? (
                   <Pressable onPress={() => setLocationSearch("")}>
                     <Feather name="x" size={16} color="#666" />
@@ -542,9 +650,9 @@ export default function OnboardingScreen() {
               </View>
 
               {/* Dropdown suggestions */}
-              {locationSearch.length > 0 && filteredLocations.length > 0 ? (
+              {locationSearch.length > 0 && locationSearch !== location && locationSuggestions.length > 0 ? (
                 <View className="bg-white rounded-sm mb-2 overflow-hidden" style={{ maxHeight: 180 }}>
-                  {filteredLocations.map((loc) => (
+                  {locationSuggestions.map((loc) => (
                     <Pressable
                       key={loc.id}
                       onPress={() => {
@@ -564,10 +672,10 @@ export default function OnboardingScreen() {
 
               {/* Map view */}
               <View className="overflow-hidden rounded-lg flex-1" style={{ minHeight: 340 }}>
-                {MapboxGL ? (
+                {hasNativeMap ? (
                   <MapboxGL.MapView
                     style={{ flex: 1 }}
-                    styleURL={MapboxGL.StyleURL.Street}
+                    styleURL={MapboxGL.StyleURL?.Street}
                   >
                     <MapboxGL.Camera
                       centerCoordinate={[selectedCoords.lng, selectedCoords.lat]}
@@ -651,7 +759,7 @@ export default function OnboardingScreen() {
                     <View
                       key={photoIndex}
                       className="relative"
-                      style={{ width: "30%", aspectRatio: 0.75 }}
+                      style={{ width: "30%", aspectRatio: 0.75, overflow: "visible" }}
                     >
                       <Pressable
                         onPress={uri ? undefined : pickPhotos}
@@ -671,8 +779,8 @@ export default function OnboardingScreen() {
                       {uri ? (
                         <Pressable
                           onPress={() => removePhoto(photoIndex)}
-                          className="absolute -top-2 -right-2 bg-red-600 rounded-full w-6 h-6 items-center justify-center"
-                          style={{ zIndex: 10 }}
+                          className="bg-red-600 rounded-full w-6 h-6 items-center justify-center"
+                          style={{ position: "absolute", top: -8, right: -8, zIndex: 10 }}
                         >
                           <Feather name="x" size={12} color="white" />
                         </Pressable>

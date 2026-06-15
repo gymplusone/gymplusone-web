@@ -1,5 +1,6 @@
 import { HeaderBackButton } from "@/components/layout/HeaderBackButton";
 import type { ThemeColors } from "@/constants/Theme";
+import React from "react";
 import { spacing, typography } from "@/constants/Theme";
 import { useThemedStyles } from "@/hooks/useThemedStyles";
 import { StyleSheet, Text, View } from "react-native";

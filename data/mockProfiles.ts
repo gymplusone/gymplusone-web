@@ -1,3 +1,7 @@
+
+const fitOne = require("@/assets/images/Rectangle1.png");
+const weightOne = require("@/assets/images/rectangle2.png")
+
 export type Profile = {
   id: string;
   name: string;
@@ -9,9 +13,9 @@ export type Profile = {
   experience: string;
   ethnicity: string;
   activityPerWeek: string;
-  mainImage: string;
-  workoutPlansImage: string;
-  weightLossImage: string;
+  mainImage: any;
+  workoutPlansImage: any;
+  weightLossImage: any;
 };
 export const mockProfiles: Profile[] = [
   {
@@ -25,9 +29,9 @@ export const mockProfiles: Profile[] = [
     experience: "Beginner · 0 - 1 Years",
     ethnicity: "American",
     activityPerWeek: "1 - 2 Days",
-    mainImage: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
-    workoutPlansImage: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80",
-    weightLossImage: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80",
+    mainImage: "https://i.postimg.cc/W138P0nH/homm.png",
+    workoutPlansImage: fitOne,
+    weightLossImage: weightOne,
   },
   {
     id: "2",

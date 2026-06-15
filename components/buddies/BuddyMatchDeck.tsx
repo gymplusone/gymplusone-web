@@ -1,5 +1,5 @@
 import { EmptyState } from "@/components/EmptyState";
-import { Pills } from "@/components/Pills";
+
 import {
   SwipeableCard,
   type SwipeableCardHandle,
@@ -16,12 +16,12 @@ import { PowerUpsellModal } from "@/components/buddies/PowerUpsellModal";
 import type { ThemeColors } from "@/constants/Theme";
 import { spacing, typography } from "@/constants/Theme";
 import { MOCK_BUDDIES } from "@/data/mockBuddies";
-import { areaOptions, fitnessGoalOptions } from "@/data/onboardingOptions";
+
 import { useTheme } from "@/features/context/ThemeContext";
 import { useThemedStyles } from "@/hooks/useThemedStyles";
 import { BlurView } from "expo-blur";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,38 +37,20 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
   const insets = useSafeAreaInsets();
   const { isDark } = useTheme();
   const styles = useThemedStyles(createStyles);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [powerModalOpen, setPowerModalOpen] = useState<boolean>(false);
   const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
-  const [area, setArea] = useState<string>("all");
-  const [goal, setGoal] = useState<string>("all");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [powerModalOpen, setPowerModalOpen] = useState(false);
-
-  const filtered = useMemo(
-    () =>
-      MOCK_BUDDIES.filter((b) => {
-        if (area !== "all" && b.area !== area) return false;
-        if (goal !== "all" && b.fitnessGoal !== goal) return false;
-        return true;
-      }),
-    [area, goal],
-  );
-
-  const hasFilters = area !== "all" || goal !== "all";
-  const visibleBuddies = filtered.slice(currentIndex);
+  const visibleBuddies = MOCK_BUDDIES.slice(currentIndex);
   const stackCards = visibleBuddies.slice(0, STACK_SIZE);
   const swipeableRef = useRef<SwipeableCardHandle>(null);
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [area, goal]);
-
   const handleSkip = () => {
-    setCurrentIndex((i) => i + 1);
+    setCurrentIndex((i: number) => i + 1);
   };
 
   /** Approve: animate off only; advance deck. Profile opens via “View profile”, not verify. */
   const handleApproveSwipe = useCallback(() => {
-    setCurrentIndex((i) => i + 1);
+    setCurrentIndex((i: number) => i + 1);
   }, []);
 
   const triggerRejectSwipe = useCallback(() => {
@@ -96,36 +78,6 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
         onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
       >
         <Text style={styles.pageTitle}>{title}</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filtersScroll}
-          contentContainerStyle={styles.filtersContent}
-        >
-          <Pills
-            options={[
-              { value: "all", label: "All" },
-              ...areaOptions.slice(0, 5).map((a) => ({ value: a, label: a })),
-            ]}
-            value={area}
-            onChange={setArea}
-          />
-        </ScrollView>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filtersScroll}
-          contentContainerStyle={styles.filtersContent}
-        >
-          <Pills
-            options={[
-              { value: "all", label: "All goals" },
-              ...fitnessGoalOptions.map((o) => ({ value: o.value, label: o.label })),
-            ]}
-            value={goal}
-            onChange={setGoal}
-          />
-        </ScrollView>
       </BlurView>
       <ScrollView
         style={styles.scroll}
@@ -139,20 +91,10 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
         {visibleBuddies.length === 0 ? (
           <View style={styles.emptyWrap}>
             <EmptyState
-              title={
-                filtered.length === 0
-                  ? "No plus ones match your filters"
-                  : "No more cards"
-              }
-              subtitle={
-                filtered.length === 0
-                  ? "Try changing or clearing filters."
-                  : "You swiped through all buddies for these filters."
-              }
-              actionLabel="Clear filters"
+              title="No more cards"
+              subtitle="You swiped through all buddies."
+              actionLabel="Restart"
               onAction={() => {
-                setArea("all");
-                setGoal("all");
                 setCurrentIndex(0);
               }}
             />
@@ -234,7 +176,6 @@ function createStyles(colors: ThemeColors) {
       marginBottom: spacing.sm,
     },
     filtersScroll: {
-      // marginBottom: spacing.xs,
       flexGrow: 0,
     },
     filtersContent: {
