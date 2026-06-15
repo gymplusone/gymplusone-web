@@ -115,7 +115,7 @@ export function FeedPostRow({
     layout === "detail" ? formatPostDetailTimestamp(post.createdAt) : null;
   const commentsForPost = feedCommentsByPost[post.id] ?? [];
 
-  const headerAndBody = (
+  const headerContent = (
     <View>
       <View style={styles.headerRow}>
         <Avatar initial={post.authorInitial} size="sm" />
@@ -146,6 +146,7 @@ export function FeedPostRow({
               <Text style={styles.dot}>·</Text>
               <Text style={styles.time}>{timeLabel}</Text>
             </View>
+            {/* More button sits outside the tappable layer to avoid nesting buttons */}
             <View ref={moreHitRef} collapsable={false}>
               <Pressable
                 accessibilityRole="button"
@@ -171,19 +172,25 @@ export function FeedPostRow({
   );
 
   const postBodyColumn = (
-    <View>
+    /**
+     * Avoids nested <button> elements (which is invalid HTML and causes hydration
+     * errors on react-native-web). The tap-to-open-post area is an absolutely
+     * positioned inset Pressable behind all visible content; interactive children
+     * (more-button, media) sit on top and handle their own events.
+     */
+    <View style={onPressPost != null ? styles.postBodyRelative : undefined}>
       {onPressPost != null ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="View post"
           onPress={onPressPost}
-          style={({ pressed }) => [pressed && styles.postContentPressed]}
-        >
-          {headerAndBody}
-        </Pressable>
-      ) : (
-        headerAndBody
-      )}
+          style={({ pressed }) => [
+            StyleSheet.absoluteFill,
+            pressed && styles.postContentPressed,
+          ]}
+        />
+      ) : null}
+      {headerContent}
       {post.image != null ? (
         <Pressable
           accessibilityRole="imagebutton"
@@ -365,6 +372,10 @@ function createStyles(colors: ThemeColors) {
   },
   mainNoDivider: {
     borderBottomWidth: 0,
+  },
+  /** Establishes a stacking context for the absolute-positioned tap area. */
+  postBodyRelative: {
+    position: "relative",
   },
   postContentPressed: {
     opacity: 0.92,

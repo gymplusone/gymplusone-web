@@ -1,499 +1,433 @@
-import { Avatar } from "@/components/Avatar";
-import { Card } from "@/components/Card";
-import { FeedPostRow } from "@/components/feed/FeedPostRow";
-import { HomeComposer } from "@/components/feed/HomeComposer";
-import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
-import { NotificationIcon } from "@/components/icons/NotificationIcon";
-import { SettingIcon } from "@/components/icons/SettingIcon";
-import type { ThemeColors } from "@/constants/Theme";
+import React, { useState } from "react";
 import {
-  card,
-  iconButton,
-  radius,
-  spacing,
-  typography,
-} from "@/constants/Theme";
-import { labels } from "@/constants/labels";
-import { useApp } from "@/features/context/AppContext";
-import { useTheme } from "@/features/context/ThemeContext";
-import { useThemedStyles } from "@/hooks/useThemedStyles";
-import type { FeedPost } from "@/types";
-import { BlurView } from "expo-blur";
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import {
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  ListRenderItem,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Dimensions,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { mockProfiles } from "@/data/mockProfiles";
+import { PremiumPaymentModal } from "@/components/PremiumPaymentModal";
 
-/** Prototype: replace with signed-in user profile image when available. */
-const USER_AVATAR_PLACEHOLDER = require("@/assets/images/gym/2149278038.jpg");
+const { width } = Dimensions.get("window");
+
+const USER_AVATAR_PLACEHOLDER = require("@/assets/ellipse.png");
 
 function getTimeGreeting(): { label: string; emoji: string } {
   const h = new Date().getHours();
-  if (h >= 5 && h < 12) return { label: "Good morning", emoji: "🌤️" };
-  if (h >= 12 && h < 17) return { label: "Good afternoon", emoji: "☀️" };
-  if (h >= 17 && h < 22) return { label: "Good evening", emoji: "🌆" };
+  if (h >= 5 && h < 12) return { label: "Good Morning", emoji: "🌤️" };
+  if (h >= 12 && h < 17) return { label: "Good Afternoon", emoji: "☀️" };
+  if (h >= 17 && h < 22) return { label: "Good Evening", emoji: "🌆" };
   return { label: "Hey there", emoji: "✨" };
 }
 
-function weeklyTargetFromFrequency(freq: string): string {
-  if (freq === "1_2") return "1–2 completed gym sessions";
-  if (freq === "3_4") return "3 completed gym sessions";
-  return "4+ completed gym sessions";
-}
-
-export default function DashboardScreen() {
+export default function MatchingHomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { colors, isDark } = useTheme();
-  const styles = useThemedStyles((themeColors) => createStyles(themeColors, isDark), [isDark]);
-  const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [superModalOpen, setSuperModalOpen] = useState(false);
   const [spotlightModalOpen, setSpotlightModalOpen] = useState(false);
-  const { onboardingData, topMatches, feedPosts, addFeedPost } = useApp();
-  const notificationCount = 3;
-  const name = onboardingData?.firstName ?? "there";
-  const avatarInitial = name.trim().charAt(0).toUpperCase() || "T";
+
+  const profile = mockProfiles[currentIndex];
   const greeting = getTimeGreeting();
-  const topMatch = topMatches[0];
-  const preferredTimeLabel = onboardingData
-    ? (labels.preferredTime[onboardingData.preferredTime]?.toLowerCase() ??
-      "evening")
-    : "evening";
-  const weeklyTarget = onboardingData
-    ? weeklyTargetFromFrequency(onboardingData.gymFrequency)
-    : "2 completed gym sessions";
-  const topScore = topMatch?.score ?? 0;
-  const goalLabel = onboardingData
-    ? labels.fitnessGoal[onboardingData.fitnessGoal]
-    : "General fitness";
-  const confidenceLabel = onboardingData
-    ? labels.confidenceLevel[onboardingData.confidenceLevel]
-    : "Medium";
 
-  const renderPost: ListRenderItem<FeedPost> = useCallback(
-    ({ item, index }) => (
-      <FeedPostRow
-        post={item}
-        showDivider={index < feedPosts.length - 1}
-        onPressPost={() => router.push(`/feed-post/${item.id}`)}
-      />
-    ),
-    [feedPosts.length, router],
-  );
+  const handleNext = () => {
+    if (currentIndex < mockProfiles.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      // Loop or show "no more profiles"
+      setCurrentIndex(0);
+    }
+  };
 
-  const FixedHeader = (
-    <View style={styles.fixedHeader}>
+  const handleLike = () => {
+    router.push(`/match-modal?id=${profile.id}&type=match`);
+  };
+
+  const handlePowerLike = () => {
+    router.push(`/match-modal?id=${profile.id}&type=powerLike`);
+  };
+
+  if (!profile) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text>No more profiles.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: 100 }]}>
+      {/* Header */}
+      <View className="flex items-center mt-8 justify-center">
+        <Text className="text-4xl font-bold text-[#000000] italic font-author">Gym+1</Text>
+        <Text className="text-[10px] font-author font-normal ">Make your workout vibe</Text>
+      </View>
       <View style={styles.headerRow}>
+        
         <View style={styles.headerLeft}>
           <Image source={USER_AVATAR_PLACEHOLDER} style={styles.userAvatar} />
           <View style={styles.headerTextCol}>
-            <Text style={styles.helloLine}>Hello {name}</Text>
+            <Text style={styles.helloLine}>Hello, Jonathan</Text>
             <Text style={styles.greetingLine}>
               {greeting.label} {greeting.emoji}
             </Text>
             <View style={styles.headerBadgeRow}>
               <Pressable
                 onPress={() => setSpotlightModalOpen(true)}
-                style={styles.headerBadge}
+                style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
               >
-                <Text style={styles.headerBadgeText}>Spotlight</Text>
+                <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Spotlight</Text>
               </Pressable>
               <Pressable
                 onPress={() => setSuperModalOpen(true)}
-                style={styles.headerBadge}
+                style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
               >
-                <Text style={styles.headerBadgeText}>Super +1</Text>
+                <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Super +1</Text>
               </Pressable>
             </View>
           </View>
         </View>
         <View style={styles.headerRight}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Notifications"
-            onPress={() => router.push("/notifications")}
-            hitSlop={iconButton.hitSlop}
-            style={({ pressed }) => [
-              styles.headerIconBtn,
-              pressed && styles.headerIconPressed,
-            ]}
-          >
+          <Pressable style={styles.headerIconBtn}>
             <View style={styles.headerIconWrap}>
-              <NotificationIcon color={colors.text} size={22} />
-              {notificationCount > 0 ? (
-                <View style={styles.notificationBadge} pointerEvents="none">
-                  <Text style={styles.notificationBadgeText} numberOfLines={1}>
-                    {notificationCount > 99 ? "99+" : notificationCount}
-                  </Text>
-                </View>
-              ) : null}
+              <Ionicons name="notifications" size={18} color="#fff" />
+              <View style={styles.notificationBadge} />
             </View>
           </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Settings"
-            onPress={() => router.push("/settings")}
-            hitSlop={iconButton.hitSlop}
-            style={({ pressed }) => [
-              styles.headerIconBtn,
-              pressed && styles.headerIconPressed,
-            ]}
-          >
-            <SettingIcon color={colors.text} size={22} />
+          <Pressable style={styles.headerIconBtn}>
+            <Ionicons name="settings-sharp" size={18} color="#fff" />
           </Pressable>
         </View>
       </View>
-      <Text style={styles.sectionHint}>
-        {/* Your community feed,  */}
-        See what your gym circle is up to · Share a win below
-      </Text>
-      <HomeComposer onSubmit={addFeedPost} />
-    </View>
-  );
 
-  const ListFooter = (
-    <View style={styles.footerBlock}>
-      <View style={styles.statRow}>
-        <View style={styles.statChip}>
-          <Text style={styles.statLabel}>Top match</Text>
-          <Text style={styles.statValue}>{topScore}%</Text>
-        </View>
-        <View style={styles.statChip}>
-          <Text style={styles.statLabel}>Goal</Text>
-          <Text style={styles.statValueSmall}>{goalLabel}</Text>
-        </View>
-        <View style={styles.statChip}>
-          <Text style={styles.statLabel}>Confidence</Text>
-          <Text style={styles.statValueSmall}>{confidenceLabel}</Text>
-        </View>
-      </View>
-
-      {topMatch ? (
-        <Card
-          onPress={() => router.push(`/match/${topMatch.profile.id}`)}
-          style={styles.primaryCard}
-        >
-          <Text style={styles.cardLabel}>Your top match</Text>
-          <View style={styles.matchRow}>
-            <Avatar initial={topMatch.profile.avatarPlaceholder} size="sm" />
-            <View style={styles.matchMeta}>
-              <Text style={styles.matchName}>
-                {topMatch.profile.name} · {topMatch.score}% match
-              </Text>
-              <Text style={styles.matchDetail}>
-                {labels.fitnessGoal[topMatch.profile.fitnessGoal]} ·{" "}
-                {topMatch.profile.area}
-              </Text>
-            </View>
-            <Pressable
-              onPress={() => router.push("/(tabs)/messages")}
-              style={({ pressed }) => [
-                styles.chatPill,
-                pressed && styles.chatPillPressed,
-              ]}
-            >
-              <Text style={styles.chatPillText}>Chat</Text>
-            </Pressable>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Main Image with SVG-like styling (Rounded + border + shadow) */}
+        <View style={styles.imageContainer}>
+          <View style={styles.imageWrapper}>
+            <Image source={{ uri: profile.mainImage }} style={styles.mainImage} />
+            <View style={styles.imageOverlay} />
           </View>
-          <View style={styles.ctaRow}>
-            <Text style={styles.cardCta}>View profile →</Text>
-            <Text style={styles.cardHint}>
-              Best time: {topMatch.bestTimeToTrain}
-            </Text>
+          {/* Circular +1 Badge */}
+          <View style={styles.plusOneBadge}>
+            <Text style={styles.plusOneBadgeText}>+1</Text>
           </View>
-        </Card>
-      ) : null}
+        </View>
 
-      <View style={styles.quickActionRow}>
-        <Pressable
-          onPress={() => router.push("/match-results")}
-          style={({ pressed }) => [
-            styles.quickAction,
-            pressed && styles.quickActionPressed,
-          ]}
-        >
-          <Text style={styles.quickActionTitle}>Find +1</Text>
-          <Text style={styles.quickActionText}>Swipe matches</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/(tabs)/plus-one")}
-          style={({ pressed }) => [
-            styles.quickAction,
-            pressed && styles.quickActionPressed,
-          ]}
-        >
-          <Text style={styles.quickActionTitle}>+1</Text>
-          <Text style={styles.quickActionText}>Discover buddies</Text>
-        </Pressable>
-      </View>
+        {/* Action Buttons overlaying the image bottom */}
+        <View style={styles.actionButtonsRow}>
+          <Pressable style={[styles.actionBtn, { width: 50, height: 50 }]} onPress={handleNext}>
+            <Feather name="x" size={24} color="#0001FF" />
+          </Pressable>
+          <Pressable style={[styles.actionBtn, { width: 64, height: 64 }]} onPress={handlePowerLike}>
+            <Ionicons name="flash" size={32} color="#FFD700" />
+          </Pressable>
+          <Pressable style={[styles.actionBtn, { width: 50, height: 50 }]} onPress={handleLike}>
+            <FontAwesome name="check" size={24} color="#0001FF" />
+          </Pressable>
+        </View>
 
-      <Card>
-        <Text style={styles.cardTitle}>This week</Text>
-        <Text style={styles.cardBody}>
-          {weeklyTarget}. Your strongest window is {preferredTimeLabel}. Plan
-          one session in the next 48 hours.
-        </Text>
-      </Card>
+        {/* Profile Info */}
+        <View style={styles.infoSection}>
+          <View style={styles.locationRow}>
+            <Feather name="map-pin" size={14} color="#555" />
+            <Text style={styles.locationText}>{profile.location}</Text>
+          </View>
+          <Text style={styles.nameAge}>{profile.name}, {profile.age}</Text>
+          <Text style={styles.distanceText}>{profile.distance}</Text>
 
-      <View style={styles.footer}>
-        <Pressable onPress={() => router.push("/match-results")} hitSlop={8}>
-          <Text style={styles.linkText}>See all matches</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
+          <Text style={styles.sectionTitle}>Bio</Text>
+          <Text style={styles.bioText}>{profile.bio}</Text>
 
-  return (
-    <KeyboardAvoidingView
-      style={styles.keyboardRoot}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={insets.top}
-    >
-      <BlurView
-        style={[styles.fixedTopWrap, { paddingTop: insets.top + spacing.md }]}
-        intensity={80}
-        tint={isDark ? "dark" : "light"}
-        onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
-      >
-        {FixedHeader}
-      </BlurView>
-      <FlatList
-        style={styles.container}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingTop: fixedHeaderHeight },
-        ]}
-        data={feedPosts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderPost}
-        // ListFooterComponent={ListFooter}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      />
+          <Text style={styles.sectionTitle}>Interests</Text>
+          <View style={styles.chipsContainer}>
+            {profile.interests.map((interest, idx) => (
+              <View key={idx} style={styles.chip}>
+                <Text style={styles.chipText}>{interest}</Text>
+              </View>
+            ))}
+          </View>
+
+          <Text style={styles.sectionTitle}>Experience</Text>
+          <Text style={styles.bioText}>{profile.experience}</Text>
+
+          <Text style={styles.sectionTitle}>Ethnicity</Text>
+          <Text style={styles.bioText}>{profile.ethnicity}</Text>
+
+          <Text style={styles.sectionTitle}>Fitness Activity per week</Text>
+          <Text style={styles.bioText}>{profile.activityPerWeek}</Text>
+
+          {/* Additional Photos / Workout Plans */}
+          <View style={styles.extraPhotoContainer}>
+            <Image source={profile.workoutPlansImage } style={styles.extraPhoto} />
+          </View>
+          <Text style={styles.extraPhotoDesc}>
+            I've been skydiving, I can juggle, and I've climbed Mt. Everest.
+          </Text>
+
+          <View style={styles.extraPhotoContainer}>
+            <Image source={profile.weightLossImage } style={styles.extraPhoto} />
+          </View>
+          <Text style={styles.extraPhotoDesc}>
+            Starts with a good cup of coffee, a walk in the park, and ends with a movie marathon.
+          </Text>
+
+          <Text style={styles.sectionTitle}>Workout Plans</Text>
+          <View style={styles.extraPhotoContainer}>
+            <Image source={{ uri: profile.mainImage }} style={styles.extraPhoto} />
+          </View>
+
+          <Text style={styles.sectionTitle}>Weight Loss</Text>
+          <Text style={styles.bioText}>Plans focused on burning calories and reducing body fat.</Text>
+          <View style={styles.extraPhotoContainer}>
+            <Image source={{ uri: profile.workoutPlansImage }} style={styles.extraPhoto} />
+          </View>
+        </View>
+      </ScrollView>
+
       <PremiumPaymentModal
         visible={superModalOpen}
         mode="super"
         onClose={() => setSuperModalOpen(false)}
-        onSuccess={(tier, price) => {
-          console.log("Upgraded to", tier, price);
-        }}
+        onSuccess={() => setSuperModalOpen(false)}
       />
       <PremiumPaymentModal
         visible={spotlightModalOpen}
         mode="spotlight"
         onClose={() => setSpotlightModalOpen(false)}
-        onSuccess={(tier, price) => {
-          console.log("Spotlight purchased", tier, price);
-        }}
+        onSuccess={() => setSpotlightModalOpen(false)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
-function createStyles(colors: ThemeColors, isDark: boolean) {
-  return StyleSheet.create({
-  keyboardRoot: { flex: 1, backgroundColor: colors.background },
-  container: { flex: 1, backgroundColor: colors.background },
-  fixedTopWrap: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
-    paddingHorizontal: spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.borderLight,
-    overflow: "hidden",
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
-  fixedHeader: { 
-    // marginBottom: spacing.sm 
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
   },
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
-    minWidth: 0,
   },
   userAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   headerTextCol: {
-    flex: 1,
-    marginLeft: spacing.md,
-    minWidth: 0,
+    marginLeft: 12,
+  },
+  helloLine: {
+    fontSize: 12,
+    color: "#888",
+    fontFamily: "manrope",
+  },
+  greetingLine: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#000",
+    fontFamily: "manrope",
+  },
+  headerBadgeRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 4,
+  },
+  headerBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  headerBadgeText: {
+    fontSize: 10,
+    fontWeight: "700",
   },
   headerRight: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-    marginLeft: spacing.sm,
-    flexShrink: 0,
+    gap: 12,
   },
   headerIconBtn: {
-    padding: iconButton.padding,
+    padding: 4,
+    backgroundColor: "#000",
+    borderRadius: 12,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  headerIconPressed: { opacity: 0.7 },
   headerIconWrap: {
     position: "relative",
   },
   notificationBadge: {
     position: "absolute",
-    top: -6,
-    right: -5,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 4,
-    borderRadius: 8,
-    backgroundColor: colors.error,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.background,
+    top: -2,
+    right: -2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "red",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 40,
+    position: "relative",
+  },
+  imageWrapper: {
+    width: "100%",
+    aspectRatio: 0.9,
+    borderRadius: 33,
+    backgroundColor: "#f0f0f0",
+    borderWidth: 6,
+    borderColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12.5,
+    elevation: 8,
+    overflow: "hidden",
+  },
+  mainImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(39, 0, 70, 0.15)", // Overlay filter from SVG
+  },
+  plusOneBadge: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#0001FF",
     alignItems: "center",
     justifyContent: "center",
   },
-  notificationBadgeText: {
-    ...typography.caption,
-    fontSize: 10,
-    lineHeight: 12,
-    color: colors.textOnPrimary,
-    fontWeight: "700",
+  plusOneBadgeText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
   },
-  helloLine: {
-    ...typography.subhead,
-    color: colors.textSecondary,
-  },
-  greetingLine: {
-    ...typography.title3,
-    fontWeight: "700",
-    color: colors.text,
-    // marginTop: 2,
-  },
-  headerBadgeRow: {
+  actionButtonsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.xs,
-    marginTop: spacing.xs,
+    justifyContent: "center",
+    gap: 20,
+    marginTop: -70, // Overlap the image
+    marginBottom: 20,
+    zIndex: 10,
   },
-  headerBadge: {
-    backgroundColor: isDark ? colors.primary + "33" : colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: isDark ? colors.primary + "66" : colors.border,
-    borderRadius: radius.full,
-    paddingVertical: 2,
-    paddingHorizontal: spacing.xs,
+  actionBtn: {
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerBadgeText: {
-    ...typography.caption,
-    color: colors.primary,
+  infoSection: {
+    paddingHorizontal: 10,
+  },
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 4,
+  },
+  locationText: {
+    fontSize: 12,
+    color: "#555",
     fontWeight: "600",
   },
-  sectionHint: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginTop: spacing.md,
-    marginBottom: spacing.md,
-  },
-  footerBlock: { paddingTop: spacing.lg },
-  statRow: { flexDirection: "row", gap: spacing.xs, marginBottom: spacing.md },
-  statChip: {
-    flex: 1,
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
+  nameAge: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#000",
     marginBottom: 2,
   },
-  statValue: { ...typography.title3, color: colors.text },
-  statValueSmall: { ...typography.subhead, color: colors.text },
-  primaryCard: { marginBottom: card.marginBottom },
-  cardLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
-    marginBottom: spacing.xxs,
+  distanceText: {
+    fontSize: 12,
+    color: "#888",
+    marginBottom: 20,
   },
-  cardTitle: {
-    ...typography.title3,
-    color: colors.text,
-    marginBottom: spacing.xs,
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#000",
+    marginTop: 20,
+    marginBottom: 8,
   },
-  cardBody: { ...typography.body, color: colors.textSecondary, lineHeight: 22 },
-  matchRow: {
+  bioText: {
+    fontSize: 14,
+    color: "#555",
+    lineHeight: 22,
+  },
+  chipsContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    marginTop: spacing.sm,
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 4,
   },
-  matchMeta: { marginLeft: spacing.md, flex: 1 },
-  matchName: { ...typography.bodyBold, color: colors.text },
-  matchDetail: { ...typography.subhead, color: colors.textSecondary },
-  chatPill: {
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.full,
+  chip: {
+    backgroundColor: "#F0F0FF",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  chatPillPressed: { opacity: 0.86 },
-  chatPillText: {
-    ...typography.subhead,
-    color: colors.textOnPrimary,
+  chipText: {
+    color: "#0001FF",
+    fontSize: 12,
     fontWeight: "700",
   },
-  ctaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: spacing.sm,
+  extraPhotoContainer: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginTop: 20,
   },
-  cardCta: { ...typography.subhead, color: colors.primary },
-  cardHint: { ...typography.caption, color: colors.textMuted },
-  quickActionRow: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+  extraPhoto: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
-  quickAction: {
-    flex: 1,
-    backgroundColor: colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.lg,
-    padding: spacing.md,
+  extraPhotoDesc: {
+    fontSize: 13,
+    color: "#555",
+    marginTop: 8,
+    lineHeight: 20,
   },
-  quickActionPressed: { opacity: 0.9 },
-  quickActionTitle: { ...typography.bodyBold, color: colors.text },
-  quickActionText: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xxs,
-  },
-  footer: { marginTop: spacing.md, paddingVertical: spacing.xs },
-  linkText: { ...typography.body, color: colors.primary },
-  });
-}
+});

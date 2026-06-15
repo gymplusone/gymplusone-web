@@ -7,16 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "gymplusone",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gymplusone.gymplusone",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people."
       }
     },
     "android": {
@@ -29,7 +26,14 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECORD_AUDIO",
+<<<<<<< HEAD
         "android.permission.RECORD_AUDIO"
+=======
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+>>>>>>> 9b9651ef8b6e3e29ddb658467045de231c68043f
       ],
       "package": "com.gymplusone.gymplusone"
     },
@@ -47,7 +51,20 @@
           "photosPermission": "Allow Gym+1 to access your photos to attach images to community posts."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.8.0",
+          "RNMapboxMapsDownloadToken": "REPLACE_WITH_YOUR_MAPBOX_SECRET_TOKEN"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Gym+1 to use Face ID to log you in."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -55,8 +72,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "7cd6de42-faf9-4eb1-965f-30b735cd3e30"
+        "projectId": "9632c19a-6dbd-4c75-b34c-6b134cd52a7d"
       }
-    }
+    },
+    "owner": "devtoby"
   }
 }

@@ -8,16 +8,18 @@ import { useApp } from "@/features/context/AppContext";
 import { useTheme } from "@/features/context/ThemeContext";
 import { Tabs, useSegments } from "expo-router";
 import React, { useMemo } from "react";
+import { View } from "react-native";
 
 export default function TabLayout() {
   const { colors } = useTheme();
   const { switchAccountEnabled } = useApp();
   const segments = useSegments();
+  
   const isMessageDetailRoute =
     segments[0] === "(tabs)" &&
     segments[1] === "messages" &&
     segments.length > 2;
-  /** Only full-screen event detail (`calendar/[id]`); not `community-event` or `analytics`. */
+    
   const isCalendarDetailRoute =
     segments[0] === "(tabs)" &&
     segments[1] === "calendar" &&
@@ -27,7 +29,7 @@ export default function TabLayout() {
 
   const screenOptions = useMemo(
     () => ({
-      tabBarActiveTintColor: colors.primary,
+      tabBarActiveTintColor: "#FFFFFF", // White for active icon
       tabBarInactiveTintColor: colors.textMuted,
       headerShown: false,
       tabBarHideOnKeyboard: true,
@@ -38,21 +40,50 @@ export default function TabLayout() {
         display: (isMessageDetailRoute || isCalendarDetailRoute
           ? "none"
           : "flex") as "none" | "flex",
+        height: 60, // Slightly taller to accommodate background
+        paddingBottom: 8,
+        paddingTop: 8,
       },
       tabBarLabelStyle: {
         fontSize: 12,
         fontWeight: "600" as const,
+        marginTop: 4,
+      },
+      tabBarItemStyle: {
+        marginVertical: 4,
+        borderRadius: 8,
       },
     }),
     [
       colors.background,
       colors.borderLight,
-      colors.primary,
       colors.surfaceElevated,
       colors.textMuted,
       isCalendarDetailRoute,
       isMessageDetailRoute,
     ],
+  );
+
+  // Custom wrapper for tab bar icons with background
+  const TabBarIconWrapper = ({ 
+    children, 
+    focused 
+  }: { 
+    children: React.ReactNode; 
+    focused: boolean;
+  }) => (
+    <View
+      style={{
+        backgroundColor: focused ? "#0001FF" : "transparent",
+        borderRadius: 100,
+        paddingHorizontal: 6,
+        paddingVertical: 6,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {children}
+    </View>
   );
 
   return (
@@ -61,7 +92,11 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => <HomeTabIcon color={color} size={24} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIconWrapper focused={focused}>
+              <HomeTabIcon color={focused ? "#FFFFFF" : color} size={36} />
+            </TabBarIconWrapper>
+          ),
         }}
       />
       <Tabs.Screen name="explore" options={{ href: null }} />
@@ -69,12 +104,15 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: switchAccountEnabled ? "Analytics" : "Calendar",
-          tabBarIcon: ({ color }) =>
-            switchAccountEnabled ? (
-              <AnalyticsTabIcon color={color} size={24} />
-            ) : (
-              <CalendarTabIcon color={color} size={24} />
-            ),
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIconWrapper focused={focused}>
+              {switchAccountEnabled ? (
+                <AnalyticsTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              ) : (
+                <CalendarTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              )}
+            </TabBarIconWrapper>
+          ),
         }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
@@ -91,8 +129,10 @@ export default function TabLayout() {
         name="plus-one"
         options={{
           title: "+1",
-          tabBarIcon: ({ color }) => (
-            <PlusOneTabIcon color={color} size={24} />
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIconWrapper focused={focused}>
+              <PlusOneTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+            </TabBarIconWrapper>
           ),
         }}
       />
@@ -100,14 +140,22 @@ export default function TabLayout() {
         name="invites"
         options={{
           title: "Invites",
-          tabBarIcon: ({ color }) => <InviteTabIcon color={color} size={24} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIconWrapper focused={focused}>
+              <InviteTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+            </TabBarIconWrapper>
+          ),
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
           title: "Chat",
-          tabBarIcon: ({ color }) => <ChatTabIcon color={color} size={24} />,
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIconWrapper focused={focused}>
+              <ChatTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+            </TabBarIconWrapper>
+          ),
         }}
       />
       <Tabs.Screen name="profile" options={{ href: null }} />

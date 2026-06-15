@@ -32,6 +32,10 @@ module.exports = {
         'lg': '16px',
         'xl': '20px',
         'xxl': '24px',
+      },
+      fontFamily: {
+        manrope: ["Manrope_400Regular"],
+        author: ["Author"],
       }
     },
   },

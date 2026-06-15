@@ -16,13 +16,16 @@ import { getPublicEventById } from "@/data/mockEvents";
 import { useThemedStyles } from "@/hooks/useThemedStyles";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { ImageBackground, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { EditPenIcon } from "@/components/icons/EditPenIcon";
+import { useTheme } from "@/features/context/ThemeContext";
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
   const [joined, setJoined] = useState(false);
 
@@ -42,31 +45,18 @@ export default function EventDetailScreen() {
     );
   }
 
-  const heroFooter = (
-    <View style={styles.heroScrim}>
-      {event.icon ? <EventIconWell variant="hero" icon={event.icon} /> : null}
-    </View>
-  );
-
   return (
     <View style={styles.screen}>
-      <ScreenHeaderBack title={event.title} onBack={() => router.back()} />
-
-      {event.imageUri ? (
-        <ImageBackground
-          source={{ uri: event.imageUri }}
-          style={styles.hero}
-          imageStyle={styles.heroImageRadius}
-        >
-          <View style={styles.heroPhotoScrim} />
-          {heroFooter}
-        </ImageBackground>
-      ) : (
-        <View style={[styles.hero, styles.heroPlaceholder]}>
-          <View style={styles.heroPlaceholderPattern} />
-          {heroFooter}
-        </View>
-      )}
+      <ScreenHeaderBack
+        title="Event"
+        onBack={() => router.back()}
+        titleAlign="center"
+        rightElement={
+          <Pressable hitSlop={8}>
+            <EditPenIcon color={colors.text} size={24} />
+          </Pressable>
+        }
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -76,23 +66,46 @@ export default function EventDetailScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.dateLine}>{event.dateLabel}</Text>
+        {event.imageUri ? (
+          <Image
+            source={{ uri: event.imageUri }}
+            style={styles.hero}
+          />
+        ) : (
+          <View style={[styles.hero, styles.heroPlaceholder]}>
+            <View style={styles.heroPlaceholderPattern} />
+          </View>
+        )}
 
-        <EventDateTimeLocationMeta
-          dateLabel={event.dateLabel}
-          timeLabel={event.timeLabel}
-          locationLabel={event.locationLabel}
-        />
+        <View style={styles.titleSection}>
+          <View style={styles.iconWellContainer}>
+             {event.icon ? <EventIconWell variant="hero" icon={event.icon} /> : null}
+          </View>
+          <View style={styles.titleTextContainer}>
+            <Text style={styles.eventTitle}>{event.title}</Text>
+            <Text style={styles.dateLine}>{event.dateLabel}</Text>
+          </View>
+        </View>
 
-        <EventMapPreview
-          address={event.locationLabel}
-          mapsQuery={event.mapsQuery}
-        />
+        <View style={styles.metaSection}>
+          <Text style={styles.sectionHeading}>Time</Text>
+          <Text style={styles.metaText}>{event.timeLabel}</Text>
+        </View>
 
-        <EventHostCard
-          name={event.creator.name}
-          avatarInitial={event.creator.avatarInitial}
-        />
+        <View style={styles.metaSection}>
+          <Text style={styles.sectionHeading}>Location</Text>
+          <EventMapPreview
+            address={event.locationLabel}
+            mapsQuery={event.mapsQuery}
+          />
+        </View>
+
+        <View style={styles.metaSection}>
+          <EventHostCard
+            name={event.creator.name}
+            avatarInitial={event.creator.avatarInitial}
+          />
+        </View>
       </ScrollView>
 
       <ScreenFooterBar insets={insets}>
@@ -118,43 +131,52 @@ function createStyles(colors: ThemeColors) {
       height: EVENT_HERO_HEIGHT,
       width: "100%",
     },
-    heroImageRadius: {
-      borderBottomLeftRadius: radius.xl,
-      borderBottomRightRadius: radius.xl,
-    },
-    heroScrim: {
-      flex: 1,
-      justifyContent: "flex-end",
-      padding: spacing.lg,
-      paddingBottom: spacing.md,
-    },
     heroPlaceholder: {
-      borderBottomLeftRadius: radius.xl,
-      borderBottomRightRadius: radius.xl,
       overflow: "hidden",
       backgroundColor: colors.surface,
     },
     heroPlaceholderPattern: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(186, 249, 37, 0.06)",
-      borderBottomLeftRadius: radius.xl,
-      borderBottomRightRadius: radius.xl,
-    },
-    heroPhotoScrim: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.25)",
-      borderBottomLeftRadius: radius.xl,
-      borderBottomRightRadius: radius.xl,
     },
     scroll: { flex: 1 },
     scrollContent: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
+      paddingTop: spacing.xs,
+    },
+    titleSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: spacing.md,
+      marginBottom: spacing.lg,
+    },
+    iconWellContainer: {
+      marginRight: spacing.md,
+    },
+    titleTextContainer: {
+      flex: 1,
+      justifyContent: "center",
+    },
+    eventTitle: {
+      ...typography.title2,
+      color: colors.text,
+      marginBottom: 4,
     },
     dateLine: {
       ...typography.subhead,
       color: colors.textSecondary,
-      marginBottom: spacing.md,
+    },
+    metaSection: {
+      marginBottom: spacing.xl,
+    },
+    sectionHeading: {
+      ...typography.title3,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    metaText: {
+      ...typography.body,
+      color: colors.textSecondary,
     },
   });
 }

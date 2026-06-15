@@ -3,8 +3,11 @@ import type { ThemeColors } from "@/constants/Theme";
 import { spacing, typography } from "@/constants/Theme";
 import { useThemedStyles } from "@/hooks/useThemedStyles";
 import { useRouter } from "expo-router";
+import { Asset } from "expo-asset";
+import * as Sharing from "expo-sharing";
+import { Feather } from "@expo/vector-icons";
 import { Fragment } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const LAST_UPDATED = "25 March 2026";
@@ -66,6 +69,23 @@ export default function PrivacyScreen() {
   const insets = useSafeAreaInsets();
   const styles = useThemedStyles(createStyles);
 
+  const openPDF = async () => {
+    try {
+      const [asset] = await Asset.loadAsync(
+        require("@/assets/GymPlusOne_Privacy_Policy.pdf")
+      );
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable && asset.localUri) {
+        await Sharing.shareAsync(asset.localUri, {
+          mimeType: "application/pdf",
+          dialogTitle: "GYM+1 Privacy Policy",
+        });
+      }
+    } catch {
+      // silently fail
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <ScreenHeaderBack
@@ -82,6 +102,27 @@ export default function PrivacyScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.updated}>Last updated: {LAST_UPDATED}</Text>
+
+        {/* Open PDF button */}
+        <Pressable
+          onPress={openPDF}
+          style={({ pressed }) => ({
+            flexDirection: "row" as const,
+            alignItems: "center" as const,
+            justifyContent: "center" as const,
+            gap: 8,
+            backgroundColor: "#0001FF",
+            borderRadius: 10,
+            paddingVertical: 14,
+            marginBottom: 24,
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <Feather name="file-text" size={18} color="#fff" />
+          <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
+            View Full Document (PDF)
+          </Text>
+        </Pressable>
 
         {SECTIONS.map((section) => (
           <Fragment key={section.title}>
