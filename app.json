@@ -26,14 +26,10 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.RECORD_AUDIO",
-<<<<<<< HEAD
-        "android.permission.RECORD_AUDIO"
-=======
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
->>>>>>> 9b9651ef8b6e3e29ddb658467045de231c68043f
       ],
       "package": "com.gymplusone.gymplusone"
     },
