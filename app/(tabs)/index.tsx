@@ -483,7 +483,7 @@ export default function MatchingHomeScreen() {
               </Text>
               <View style={styles.headerBadgeRow}>
                 <View style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}>
-                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>111 Hug × 18 Hug</Text>
+                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>spotlight</Text>
                 </View>
               </View>
             </View>

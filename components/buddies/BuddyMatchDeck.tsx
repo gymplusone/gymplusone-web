@@ -23,6 +23,8 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path, Defs, RadialGradient, Stop } from "react-native-svg";
+import { SpotlightModal, SuperModal } from "./spotlightModal";
+import FilterIconCustom from "../icons/FilterIconCustom";
 
 const STACK_SIZE = 3;
 const CARD_OFFSET = 10;
@@ -152,6 +154,7 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
   const stackCards = visibleBuddies.slice(0, STACK_SIZE);
   const swipeableRef = useRef<SwipeableCardHandle>(null);
   const greeting = getTimeGreeting();
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const handleSkip = () => {
     setCurrentIndex((i: number) => i + 1);
@@ -255,11 +258,11 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
         ) : (
           <>
             {/* Filter Toolbar Section built directly above the stack view */}
-            <View style={styles.filterToolbar}>
-              <Pressable style={styles.filterBtn}>
-                <FilterIcon />
-              </Pressable>
-            </View>
+          <View style={styles.filterRow}>
+                    <Pressable style={styles.filterBtn} onPress={() => setFilterOpen(true)}>
+                      <FilterIconCustom size={30} />
+                    </Pressable>
+                  </View>
 
             <View style={styles.stackContainer}>
               {[...stackCards].reverse().map((buddy, reverseIdx) => {
@@ -319,7 +322,23 @@ export function BuddyMatchDeck({ title }: BuddyMatchDeckProps) {
           </>
         )}
       </ScrollView>
-
+<SpotlightModal 
+        visible={spotlightModalOpen} 
+        onClose={() => setSpotlightModalOpen(false)}
+        onUpgrade={() => {
+          // Handle upgrade action
+          console.log("Upgrade to Spotlight");
+        }}
+      />
+      
+      <SuperModal 
+        visible={superModalOpen} 
+        onClose={() => setSuperModalOpen(false)}
+        onUpgrade={() => {
+          // Handle upgrade action
+          console.log("Upgrade to Super");
+        }}
+      />
       <PowerUpsellModal visible={powerModalOpen} onClose={closePowerModal} />
     </View>
   );
@@ -342,6 +361,11 @@ function createStyles(colors: ThemeColors) {
       paddingHorizontal: 4,
       paddingTop: 14,
     },
+    filterRow: {
+    paddingHorizontal: 20,
+    alignItems: "flex-end",
+    marginBottom: 4,
+  },
     headerLeft: { flexDirection: "row", alignItems: "center" },
     userAvatar: { width: 50, height: 50, borderRadius: 25 },
     headerTextCol: { marginLeft: 12 },
