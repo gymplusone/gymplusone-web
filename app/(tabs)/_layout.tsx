@@ -14,12 +14,12 @@ export default function TabLayout() {
   const { colors } = useTheme();
   const { switchAccountEnabled } = useApp();
   const segments = useSegments();
-  
+
   const isMessageDetailRoute =
     segments[0] === "(tabs)" &&
     segments[1] === "messages" &&
     segments.length > 2;
-    
+
   const isCalendarDetailRoute =
     segments[0] === "(tabs)" &&
     segments[1] === "calendar" &&
@@ -29,55 +29,55 @@ export default function TabLayout() {
 
   const screenOptions = useMemo(
     () => ({
-      tabBarActiveTintColor: "#FFFFFF", // White for active icon
-      tabBarInactiveTintColor: colors.textMuted,
+      // Active tint = blue for both icon and label
+      tabBarActiveTintColor: "#0001FF",
+      tabBarInactiveTintColor: "#999999",
+      tabBarShowLabel: true,
       headerShown: false,
       tabBarHideOnKeyboard: true,
       sceneStyle: { backgroundColor: colors.background },
       tabBarStyle: {
-        backgroundColor: colors.surfaceElevated,
-        borderTopColor: colors.borderLight,
+        backgroundColor: "#FFFFFF",
+        borderTopColor: "#E5E5E5",
+        borderTopWidth: 1,
         display: (isMessageDetailRoute || isCalendarDetailRoute
           ? "none"
           : "flex") as "none" | "flex",
-        height: 60, // Slightly taller to accommodate background
+        height: 68,
         paddingBottom: 8,
-        paddingTop: 8,
+        paddingTop: 4,
       },
       tabBarLabelStyle: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: "600" as const,
-        marginTop: 4,
+        marginTop: 2,
       },
       tabBarItemStyle: {
-        marginVertical: 4,
         borderRadius: 8,
+        paddingVertical: 2,
       },
     }),
     [
       colors.background,
-      colors.borderLight,
-      colors.surfaceElevated,
-      colors.textMuted,
       isCalendarDetailRoute,
       isMessageDetailRoute,
     ],
   );
 
-  // Custom wrapper for tab bar icons with background
-  const TabBarIconWrapper = ({ 
-    children, 
-    focused 
-  }: { 
-    children: React.ReactNode; 
+  // The blue pill wraps the icon when focused; active icon = white on blue, inactive = grey
+  const TabBarIconWrapper = ({
+    children,
+    focused,
+  }: {
+    children: React.ReactNode;
     focused: boolean;
   }) => (
     <View
       style={{
         backgroundColor: focused ? "#0001FF" : "transparent",
         borderRadius: 100,
-        paddingHorizontal: 6,
-        paddingVertical: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 5,
         alignItems: "center",
         justifyContent: "center",
       }}
@@ -94,7 +94,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
-              <HomeTabIcon color={focused ? "#FFFFFF" : color} size={36} />
+              <HomeTabIcon color={focused ? "#FFFFFF" : color} size={24} />
             </TabBarIconWrapper>
           ),
         }}
@@ -107,9 +107,9 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
               {switchAccountEnabled ? (
-                <AnalyticsTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+                <AnalyticsTabIcon color={focused ? "#FFFFFF" : color} size={22} />
               ) : (
-                <CalendarTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+                <CalendarTabIcon color={focused ? "#FFFFFF" : color} size={22} />
               )}
             </TabBarIconWrapper>
           ),
@@ -131,7 +131,7 @@ export default function TabLayout() {
           title: "+1",
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
-              <PlusOneTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              <PlusOneTabIcon color={focused ? "#FFFFFF" : color} size={22} />
             </TabBarIconWrapper>
           ),
         }}
@@ -142,7 +142,7 @@ export default function TabLayout() {
           title: "Invites",
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
-              <InviteTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              <InviteTabIcon color={focused ? "#FFFFFF" : color} size={22} />
             </TabBarIconWrapper>
           ),
         }}
@@ -153,7 +153,7 @@ export default function TabLayout() {
           title: "Chat",
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
-              <ChatTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              <ChatTabIcon color={focused ? "#FFFFFF" : color} size={22} />
             </TabBarIconWrapper>
           ),
         }}

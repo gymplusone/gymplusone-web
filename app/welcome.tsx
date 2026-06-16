@@ -20,7 +20,7 @@ function SocialButton({
   dot?: string;
 }) {
   return (
-    <Pressable className="flex-row items-center justify-center bg-black h-12 rounded-sm active:opacity-75">
+    <Pressable className="flex-row font-manrope items-center justify-center bg-black h-12 rounded-sm active:opacity-75">
       <View className="items-center justify-center bg-white rounded-full w-5 h-5 mr-3">
         {Icon ? (
           <Icon width={12} height={12} />
@@ -28,7 +28,7 @@ function SocialButton({
           <Text className="text-black text-[11px] font-black">{dot}</Text>
         )}
       </View>
-      <Text className="text-white text-xs font-semibold">{label}</Text>
+      <Text className="text-white text-sm font-medium">{label}</Text>
     </Pressable>
   );
 }
@@ -112,7 +112,7 @@ export default function WelcomeScreen() {
 
         <View className="items-center font-author mt-12">
           <Text className="text-white text-4xl italic font-black">Gym+1</Text>
-          <Text className="text-white font-normal text-md italic">Match your workout vibe</Text>
+          <Text className="text-white font-[375] text-md italic">Match your workout vibe</Text>
         </View>
 
         <Text className="text-white text-2xl font-bold leading-7 mt-7 text-center font-manrope">
@@ -153,13 +153,13 @@ export default function WelcomeScreen() {
             onPress={handleLogin}
             className="items-center justify-center bg-black h-12 rounded-sm active:opacity-75"
           >
-            <Text className="text-white font-bold text-sm">Log In</Text>
+            <Text className="text-white font-manrope font-bold ">Log In</Text>
           </Pressable>
         </View>
 
         <View className="flex-row items-center gap-3 my-5">
           <View className="flex-1 h-[1px] bg-white/15" />
-          <Text className="text-white/85 text-xs font-medium">Or</Text>
+          <Text className="text-white text-sm font-medium">Or</Text>
           <View className="flex-1 h-[1px] bg-white/15" />
         </View>
 
@@ -183,10 +183,11 @@ export default function WelcomeScreen() {
             </Pressable>
           </View>
 
+      <Text className="flex justify-center text-white text-xs font-medium font-manrope">By continuing, you agree to our</Text>
           <Text className="text-white/70 text-[9px] mt-1.5 text-center font-medium">
-            <Link href="/terms" className="hover:underline">Term of service</Link>{"     "}
-            <Link href="/privacy" className="hover:underline">Privacy policy</Link>{"     "}
-            <Link href="/cookie-policy" className="hover:underline">Cookie policies</Link>
+            <Link href="/terms" className="underline">Term of service</Link>{"     "}
+            <Link href="/privacy" className="underline">Privacy policy</Link>{"     "}
+            <Link href="/cookie-policy" className="underline">Cookie policies</Link>
           </Text>
         </View>
       </View>

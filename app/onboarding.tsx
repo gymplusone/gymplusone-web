@@ -227,7 +227,7 @@ function validateStep(
 export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { completeOnboarding } = useApp();
+  const { completeOnboarding, setSwitchAccountEnabled } = useApp();
 
   const [index, setIndex] = useState(0);
   const [age, setAge] = useState("25");
@@ -447,14 +447,20 @@ export default function OnboardingScreen() {
               <ChoiceButton
                 label="+1"
                 selected={false}
-                onPress={next}
+                onPress={() => {
+                  setSwitchAccountEnabled(false);
+                  next();
+                }}
                 icon={gymIcon}
                 showRadio={false}
               />
               <ChoiceButton
                 label="Personal Trainer"
                 selected={false}
-                onPress={next}
+                onPress={() => {
+                  setSwitchAccountEnabled(true);
+                  next();
+                }}
                 icon={gymIcon}
                 showRadio={false}
               />
@@ -484,29 +490,47 @@ export default function OnboardingScreen() {
 
           {/* ── Step: genderOpen ── */}
           {step === "genderOpen" ? (
-            <Centered title="">
-              <Text className="text-white text-[17px] mb-3.5 text-center font-manrope">Age</Text>
-              <TextInput
-                value={age}
-                onChangeText={(v) => { setAge(v); setValidationError(null); }}
-                keyboardType="number-pad"
-                className="bg-black rounded-[3px] text-white h-12 text-center font-manrope"
-              />
-              <Text className="text-white text-[17px] mb-3.5 text-center mt-7 font-manrope">Gender</Text>
-              {["Male", "Female", "Nonbinary"].map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setGender(item)}
-                  className={`h-10 justify-center px-[18px] active:opacity-75 rounded-[3px] ${
-                    gender === item ? "bg-[#0001FF]" : "bg-black"
-                  }`}
-                >
-                  <Text className={`text-sm font-manrope ${gender === item ? "text-white" : "text-white/60"}`}>
-                    {item}
-                  </Text>
-                </Pressable>
-              ))}
-            </Centered>
+       <Centered title="">
+  <Text className="text-white text-[17px] mb-3.5 text-center font-manrope">Age</Text>
+  <TextInput
+    value={age}
+    onChangeText={(v) => { setAge(v); setValidationError(null); }}
+    keyboardType="number-pad"
+    className="bg-black rounded-[3px] text-white h-12 text-center font-manrope"
+  />
+  <Text className="text-white text-[17px] mb-3.5 text-center mt-7 font-manrope">Gender</Text>
+ {["Male", "Female", "Nonbinary"].map((item) => (
+  <Pressable
+    key={item}
+    onPress={() => setGender(item)}
+    className={`flex-row items-center justify-between h-10 px-[18px] active:opacity-75 rounded-[3px] ${
+      gender === item ? "bg-white" : "bg-white"
+    }`}
+  >
+    {/* Label */}
+    <Text
+      className={`text-sm font-manrope ${
+        gender === item ? "text-black" : "text-black"
+      }`}
+    >
+      {item}
+    </Text>
+
+    {/* Checkbox */}
+     <View
+      className={`w-5 h-5 rounded-full border items-center justify-center ${
+        gender === item
+          ? "bg-black border-black"
+          : "border-white/40 bg-transparent"
+      }`}
+    >
+      {gender === item ? (
+        <Text className="text-white text-[12px] font-bold">✓</Text>
+      ) : null}
+    </View>
+  </Pressable>
+))}
+</Centered>
           ) : null}
 
           {/* ── Step: days ── */}
@@ -542,7 +566,7 @@ export default function OnboardingScreen() {
           {/* ── Step: goals ── */}
           {step === "goals" ? (
             <Centered title="What are your main fitness goals?">
-              <View className="content-center flex-row flex-wrap gap-[9px] justify-center">
+              <View className="content-center flex-row flex-wrap  gap-[9px] justify-center">
                 {goalOptions.map((item) => (
                   <Chip
                     key={item}
@@ -872,16 +896,25 @@ function ChoiceButton({
         {IconComponent ? (
           <IconComponent width={22} height={22} color="white" />
         ) : null}
-        <Text className="text-white text-[14px] font-normal font-manrope">{label}</Text>
+
+        <Text className="text-white text-[14px] font-normal font-manrope">
+          {label}
+        </Text>
       </View>
+
+      {/* CHECKBOX (replaces radio) */}
       {showRadio ? (
-        <RadioButton.Android
-          value=""
-          status={selected ? "checked" : "unchecked"}
-          onPress={onPress}
-          color="#ffffff"
-          uncheckedColor="#9ca3af"
-        />
+        <View
+          className={`w-5 h-5 rounded-full border items-center justify-center ${
+            selected
+              ? "bg-white border-white"
+              : "border-white/40 bg-transparent"
+          }`}
+        >
+          {selected ? (
+            <Text className="text-black text-[12px] font-bold">✓</Text>
+          ) : null}
+        </View>
       ) : null}
     </Pressable>
   );
@@ -899,7 +932,7 @@ function Chip({
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full px-7 border border-white py-3 active:opacity-75 ${
+      className={`rounded-full text-center px-7 border border-white w-[85%] py-3 active:opacity-75 ${
         active ? "bg-[#0001FF]" : "bg-white"
       }`}
     >

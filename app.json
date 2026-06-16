@@ -7,6 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "gymplusone",
     "userInterfaceStyle": "automatic",
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gymplusone.gymplusone",
@@ -16,6 +17,7 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people."
       }
     },
+
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -33,11 +35,13 @@
       ],
       "package": "com.gymplusone.gymplusone"
     },
+
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
       "expo-web-browser",
@@ -51,8 +55,7 @@
       [
         "@rnmapbox/maps",
         {
-          "RNMapboxMapsVersion": "11.8.0",
-          "RNMapboxMapsDownloadToken": "REPLACE_WITH_YOUR_MAPBOX_SECRET_TOKEN"
+          "RNMapboxMapsVersion": "11.8.0"
         }
       ],
       [
@@ -62,15 +65,19 @@
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true
     },
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "9632c19a-6dbd-4c75-b34c-6b134cd52a7d"
-      }
+      },
+      "mapboxAccessToken": "pk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtNzIyOTY1djA1aGYybHIzaXE1eG5odTcifQ.Esxl0GXlX91G4919X0bnGg"
     },
+
     "owner": "devtoby"
   }
 }
