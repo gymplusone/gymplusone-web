@@ -3,8 +3,7 @@
 
 export default function FilterIconCustom({ size }: { size: number }) {
     return (
-        <>
-            <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <><svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g clip-path="url(#clip0_504_9143)">
                     <path d="M8.02492 22.9093H3.37492C2.88742 22.9093 2.49992 22.5218 2.49992 22.0343C2.49992 21.5468 2.88742 21.1593 3.37492 21.1593H8.02492C8.51242 21.1593 8.90008 21.5468 8.90008 22.0343C8.90008 22.5218 8.51242 22.9093 8.02492 22.9093Z" fill="url(#paint0_linear_504_9143)" />
                     <path d="M16.8749 22.9093H13.1249C12.6374 22.9093 12.2499 22.5218 12.2499 22.0343C12.2499 21.5468 12.6374 21.1593 13.1249 21.1593H16.8749C17.3624 21.1593 17.75 21.5468 17.75 22.0343C17.75 22.5218 17.3624 22.9093 16.8749 22.9093Z" fill="url(#paint1_linear_504_9143)" />
