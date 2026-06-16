@@ -36,7 +36,7 @@ export const darkColors: ThemeColors = {
   primaryDark: "#0000CC",
   secondary: brandPrimary,
   secondaryMuted: "#F9A8D4",
-  background: "#14171E",
+  background: "#ffffff",
   surface: "#1E2229",
   surfaceElevated: "#252A33",
   text: "#F3F4F6",

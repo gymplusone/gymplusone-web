@@ -12,12 +12,23 @@ import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   FlatList,
+  Image,
   type ListRenderItemInfo,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const jennieImg = require("@/assets/jennie.png");
+
+function getTimeGreeting(): { label: string; emoji: string } {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return { label: "Good Morning", emoji: "🌤️" };
+  if (h >= 12 && h < 17) return { label: "Good Afternoon", emoji: "☀️" };
+  if (h >= 17 && h < 22) return { label: "Good Evening", emoji: "🌆" };
+  return { label: "Hey there", emoji: "✨" };
+}
 
 export default function InvitesScreen() {
   const insets = useSafeAreaInsets();
@@ -29,6 +40,9 @@ export default function InvitesScreen() {
     null,
   );
   const [payModalOpen, setPayModalOpen] = useState(false);
+
+  // Added initialization for the greeting data structure
+  const greeting = getTimeGreeting();
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<InviteProfile>) => (
@@ -48,11 +62,17 @@ export default function InvitesScreen() {
         tint={isDark ? "dark" : "light"}
         onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Invites</Text>
-          <View style={styles.headerRightSpacer} />
+        <View style={styles.headerLeft}>
+          <Image source={jennieImg} style={styles.userAvatar} />
+          <View style={styles.headerTextCol}>
+            <Text style={styles.helloLine}>Hello, Jennie</Text>
+            <Text style={styles.greetingLine}>
+              {greeting.label} {greeting.emoji}
+            </Text>
+          </View>
         </View>
       </BlurView>
+      
       {MOCK_INVITES.length === 0 ? (
         <View
           style={[
@@ -80,6 +100,7 @@ export default function InvitesScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+      
       <InviteUpgradeModal
         visible={selectedInvite != null}
         invite={selectedInvite}
@@ -105,11 +126,7 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.background,
     },
     fixedTopWrap: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 20,
+  
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.borderLight,
       overflow: "hidden",
@@ -120,6 +137,32 @@ function createStyles(colors: ThemeColors) {
       alignItems: "center",
       marginBottom: spacing.md,
       paddingHorizontal: spacing.lg,
+    },
+    // Restored structure definitions to satisfy TypeScript styles resolution
+    headerLeft: {
+      flexDirection: "row", 
+      alignItems: "center",
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.md,
+    },
+    userAvatar: { 
+      width: 50, 
+      height: 50, 
+      borderRadius: 25 
+    },
+    headerTextCol: { 
+      marginLeft: 12 
+    },
+    helloLine: {
+      fontSize: 12,
+      color: "#888",
+      fontFamily: "manrope",
+    },
+    greetingLine: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: colors.text,
+      fontFamily: "manrope",
     },
     title: {
       ...typography.title1,
