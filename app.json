@@ -24,6 +24,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+<<<<<<< HEAD
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.ACCESS_FINE_LOCATION",
@@ -31,6 +32,9 @@
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT"
       ],
+=======
+      "permissions": ["android.permission.RECORD_AUDIO"],
+>>>>>>> 07bd356a006bae0f069bc9634b46826a4af021d5
       "package": "com.gymplusone.gymplusone"
     },
     "web": {
@@ -71,6 +75,10 @@
         "projectId": "f0df5c2c-d8c3-4270-b812-fdaa2d28b9a5"
       }
     },
+<<<<<<< HEAD
     "owner": "kolawole17"
+=======
+    "owner": "devtoby"
+>>>>>>> 07bd356a006bae0f069bc9634b46826a4af021d5
   }
 }
