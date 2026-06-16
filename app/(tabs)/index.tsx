@@ -24,7 +24,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const { width } = Dimensions.get("window");
 const USER_AVATAR_PLACEHOLDER = require("@/assets/ellipse.png");
 const jennieImg = require("@/assets/jennie.png");
-const loyal = require("@/assets/plate1.png");
+// const loyal = require("@/assets/plate1.png");
 
 function getTimeGreeting(): { label: string; emoji: string } {
   const h = new Date().getHours();
@@ -483,7 +483,7 @@ export default function MatchingHomeScreen() {
               </Text>
               <View style={styles.headerBadgeRow}>
                 <View style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}>
-                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>111 Hug × 18 Hug</Text>
+                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>spotlight</Text>
                 </View>
               </View>
             </View>
