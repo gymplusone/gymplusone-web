@@ -15,7 +15,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const styles = useThemedStyles(createStyles);
   const { onboardingData, hasCompletedOnboarding } = useApp();
-
+  
   if (!hasCompletedOnboarding || !onboardingData) {
     return (
       <View

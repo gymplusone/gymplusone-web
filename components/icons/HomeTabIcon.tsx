@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 /** Matches `assets/images/icons/tabs/home.svg` — tab tint drives fill. */
 export function HomeTabIcon({
   color,
-  size = 32,
+  size = 47,
 }: {
   color: string;
   size?: number;

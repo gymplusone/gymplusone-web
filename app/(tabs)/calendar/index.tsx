@@ -1,12 +1,10 @@
-import JennieAvatar from "@/assets/images/jennie.svg";
 import {
   CalendarPickerModal,
   getCalendarPickerPanelLayout,
   startOfCalendarDay,
   startOfCalendarMonth,
 } from "@/components/events/CalendarPickerModal";
-import { FeedPostRow } from "@/components/feed/FeedPostRow";
-import { HomeComposer } from "@/components/feed/HomeComposer";
+import { NearbyEventListRow } from "@/components/events/NearbyEventListRow";
 import { CalendarTabIcon } from "@/components/icons/CalendarTabIcon";
 import { PlusOneTabIcon } from "@/components/icons/PlusOneTabIcon";
 import {
@@ -14,39 +12,29 @@ import {
   MenuDropdownModal,
   MenuDropdownSeparator,
 } from "@/components/layout/MenuDropdownModal";
-import { useApp } from "@/features/context/AppContext";
+import { getPublicEventListItems } from "@/data/mockEvents";
 import { useTheme } from "@/features/context/ThemeContext";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-function getTimeGreeting(): { label: string; emoji: string } {
-  const h = new Date().getHours();
-  if (h >= 5 && h < 12) return { label: "Good Morning", emoji: "🌤️" };
-  if (h >= 12 && h < 17) return { label: "Good Afternoon", emoji: "☀️" };
-  if (h >= 17 && h < 22) return { label: "Good Evening", emoji: "🌆" };
-  return { label: "Hey there", emoji: "✨" };
-}
+const NEARBY_EVENTS = getPublicEventListItems();
 
 export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors, isDark } = useTheme();
-  const { feedPosts, addFeedPost } = useApp();
-
   const [fixedHeaderHeight, setFixedHeaderHeight] = useState(0);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() =>
-    startOfCalendarMonth(startOfCalendarDay(new Date()))
+    startOfCalendarMonth(startOfCalendarDay(new Date())),
   );
   const [calendarSelected, setCalendarSelected] = useState(() =>
-    startOfCalendarDay(new Date())
+    startOfCalendarDay(new Date()),
   );
-
-  const greeting = getTimeGreeting();
 
   const closeCreateMenu = () => setCreateMenuOpen(false);
   const closeCalendarModal = useCallback(() => setCalendarModalOpen(false), []);
@@ -60,99 +48,76 @@ export default function CalendarScreen() {
     getCalendarPickerPanelLayout(insets.top);
 
   return (
-    <View className="flex" style={{ backgroundColor: colors.background }}>
-      {/* HEADER */}
+    <View className="flex-1 bg-background px-4 font-manrope">
       <BlurView
-        intensity={85}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 20,
+          paddingTop: insets.top + 16,
+          paddingHorizontal: 16,
+          borderBottomWidth: 0.5,
+          borderBottomColor: colors.borderLight,
+          overflow: "hidden",
+        }}
+        intensity={80}
         tint={isDark ? "dark" : "light"}
         onLayout={(e) => setFixedHeaderHeight(e.nativeEvent.layout.height)}
-        style={{ paddingTop: insets.top + 10 }}
-        className="px-4 pb-2 border-b"
       >
-        {/* Brand */}
-        <View className="items-center mb-1">
-          <Text
-            className="text-[22px] font-black italic"
-            style={{ color: colors.text }}
-          >
-            Gym<Text style={{ color: colors.primary }}>+1</Text>
-          </Text>
-
-          <Text className="text-xs italic" style={{ color: colors.textMuted }}>
-            Match your workout vibe
-          </Text>
-        </View>
-
-        {/* Profile row */}
-        <View className="flex-row items-center justify-between mb-2">
-          <View className="flex-row items-center flex-1">
-            <View className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 mr-2">
-              <JennieAvatar width={48} height={48} />
-            </View>
-
-            <View className="flex-1">
-              <Text className="text-xs" style={{ color: colors.textMuted }}>
+        {/* Profile and Quick Actions Row */}
+        <View className="flex-row items-center justify-between mb-4">
+          <View className="flex-row items-center gap-2">
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" }}
+              style={{ width: 48, height: 48, borderRadius: 24 }}
+              className="bg-gray-300"
+            />
+            <View>
+              <Text className="text-sm text-textSecondary font-manrope" style={{ fontFamily: "manrope" }}>
                 Hello Jennie
               </Text>
-
-              <Text className="text-[17px] font-extrabold" style={{ color: colors.text }}>
-                {greeting.label} {greeting.emoji}
+              <Text className="text-lg font-bold text-[#000000] font-manrope" style={{ fontFamily: "manrope" }}>
+                Good Morning🌤️
               </Text>
-
-              <View className="flex-row gap-2 mt-1">
-                <Pressable
-                  onPress={() => {}}
-                  className="px-3 py-1 rounded-full"
-                  style={{ backgroundColor: colors.primary }}
-                >
-                  <Text className="text-white text-[11px] font-semibold">
-                    Spotlight
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={() => setCreateMenuOpen((o) => !o)}
-                  className="px-3 py-1 rounded-full"
-                  style={{ backgroundColor: colors.primary }}
-                >
-                  <Text className="text-white text-[11px] font-semibold">
-                    Super +1
-                  </Text>
-                </Pressable>
-              </View>
             </View>
           </View>
-
-          {/* icons */}
-          <View className="flex-row gap-2">
+          
+          <View className="flex-row items-center gap-1">
             <Pressable
+              hitSlop={8}
+              style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.7 : 1 }]}
               onPress={openCalendarModal}
-              className="w-10 h-10 rounded-xl items-center justify-center"
-              style={{ backgroundColor: "#111" }}
+              accessibilityLabel="Show calendar"
+              accessibilityState={{ expanded: calendarModalOpen }}
             >
-              <CalendarTabIcon color="#fff" size={18} />
+              <CalendarTabIcon color={colors.text} size={26} />
             </Pressable>
-
             <Pressable
+              hitSlop={8}
+              style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.7 : 1 }]}
               onPress={() => setCreateMenuOpen((o) => !o)}
-              className="w-10 h-10 rounded-xl items-center justify-center"
-              style={{ backgroundColor: "#111" }}
+              accessibilityLabel="Show create options"
+              accessibilityState={{ expanded: createMenuOpen }}
             >
-              <PlusOneTabIcon color="#fff" size={18} />
+              <PlusOneTabIcon color={colors.text} size={26} />
             </Pressable>
           </View>
         </View>
 
-        {/* Composer */}
-        <View className="-mx-4">
-          <HomeComposer
-            onSubmit={(text, imageUri) => addFeedPost(text, imageUri)}
-            placeholder="What's on your mind?"
-          />
+        {/* Section Title Heading */}
+        <View className="flex-row items-center justify-between gap-4 mb-1">
+          <Text className="flex-1 text-2xl font-bold text-text font-manrope" style={{ fontFamily: "Manrope" }}>
+            Events near you
+          </Text>
         </View>
+        
+        <Text className="text-textSecondary text-sm leading-5 mb-4 font-manrope" style={{ fontFamily: "Manrope" }}>
+          People in your area are going to these events. RSVP or create your own events!
+        </Text>
       </BlurView>
 
-      {/* MODALS */}
       <MenuDropdownModal
         visible={createMenuOpen}
         onClose={closeCreateMenu}
@@ -186,24 +151,22 @@ export default function CalendarScreen() {
         onSelectDay={setCalendarSelected}
       />
 
-      {/* FEED */}
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
-          paddingTop: fixedHeaderHeight,
-          paddingBottom: insets.bottom + 24,
-          paddingHorizontal: 16,
+          paddingTop: fixedHeaderHeight + 8,
+          paddingBottom: insets.bottom + 16,
         }}
         showsVerticalScrollIndicator={false}
       >
-        {feedPosts.map((post, index) => (
-          <FeedPostRow
-            key={post.id}
-            post={post}
-            showDivider={index < feedPosts.length - 1}
-            onPressPost={() =>
-              router.push(`/(tabs)/calendar/${post.id}` as any)
-            }
+        {NEARBY_EVENTS.map((item, index) => (
+          <NearbyEventListRow
+            key={item.id}
+            title={item.title}
+            statusLine={item.statusLine}
+            icon={item.icon}
+            showSeparator={index < NEARBY_EVENTS.length - 1}
+            onPress={() => router.push(`/(tabs)/calendar/${item.id}`)}
           />
         ))}
       </ScrollView>

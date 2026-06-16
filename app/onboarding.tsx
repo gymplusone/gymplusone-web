@@ -932,7 +932,7 @@ function Chip({
   return (
     <Pressable
       onPress={onPress}
-      className={`rounded-full text-center px-7 border border-white w-[85%] py-3 active:opacity-75 ${
+      className={`rounded-full text-center px-7 border border-white  py-3 active:opacity-75 ${
         active ? "bg-[#0001FF]" : "bg-white"
       }`}
     >

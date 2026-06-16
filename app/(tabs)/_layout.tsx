@@ -31,7 +31,7 @@ export default function TabLayout() {
     () => ({
       // Active tint = blue for both icon and label
       tabBarActiveTintColor: "#0001FF",
-      tabBarInactiveTintColor: "#999999",
+      tabBarInactiveTintColor: "#000000",
       tabBarShowLabel: true,
       headerShown: false,
       tabBarHideOnKeyboard: true,
@@ -94,7 +94,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ focused, color }) => (
             <TabBarIconWrapper focused={focused}>
-              <HomeTabIcon color={focused ? "#FFFFFF" : color} size={24} />
+              <HomeTabIcon color={focused ? "#FFFFFF" : color} size={32} />
             </TabBarIconWrapper>
           ),
         }}

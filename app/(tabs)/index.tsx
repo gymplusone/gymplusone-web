@@ -14,6 +14,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View
 } from "react-native";
@@ -21,6 +23,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 const USER_AVATAR_PLACEHOLDER = require("@/assets/ellipse.png");
+const jennieImg = require("@/assets/jennie.png");
+const loyal = require("@/assets/plate1.png");
 
 function getTimeGreeting(): { label: string; emoji: string } {
   const h = new Date().getHours();
@@ -62,6 +66,155 @@ const DEFAULT_FILTER: FilterState = {
   interests: [],
 };
 
+// ─── Mock Feed Data ──────────────────────────────────────────────────────────
+const MOCK_FEED = [
+  {
+    id: "1",
+    user: {
+      name: "Eleanor Pena",
+      avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+      isVerified: false,
+    },
+    time: "45 minutes ago",
+    content: "Enter the email associated with your account and we'll send an email with code to reset.",
+    likes: 99,
+    comments: 99,
+    image: "https://picsum.photos/400/200",
+  },
+  {
+    id: "2",
+    user: {
+      name: "Selena Apache",
+      avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+      isVerified: false,
+    },
+    time: "2 hours ago",
+    content: "Enter the email associated with your account and we'll send an email with code to reset.",
+    likes: 45,
+    comments: 12,
+    image: "https://picsum.photos/400/200",
+    isPlan: true,
+    plan: {
+      title: "Muscle Building Plan",
+      price: "£39.99",
+      description: "Designed to increase muscle mass.",
+    },
+  },
+  {
+    id: "3",
+    user: {
+      name: "Eleanor Pena",
+      avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+      isVerified: true,
+    },
+    time: "3 hours ago",
+    content: "Enter the email associated with your account and we'll send an email with code to reset.",
+    likes: 78,
+    comments: 34,
+    image: null,
+  },
+];
+
+// ─── Feed Post Component ─────────────────────────────────────────────────────
+const FeedPost = ({ post }: { post: any }) => {
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes);
+
+  const handleLike = () => {
+    if (liked) {
+      setLikesCount(likesCount - 1);
+    } else {
+      setLikesCount(likesCount + 1);
+    }
+    setLiked(!liked);
+  };
+
+  return (
+    <View style={styles.feedItem}>
+      {/* Header - Avatar, Name, Time, and 3-dot menu */}
+      <View style={styles.feedHeader}>
+        <Image 
+          source={{ uri: post.user.avatar }} 
+          style={styles.feedAvatar}
+        />
+        <View style={styles.feedUserInfo}>
+          <View style={styles.feedUserNameRow}>
+            <Text style={styles.feedUserName}>
+              {post.user.name}
+            </Text>
+            {post.user.isVerified && (
+              <View style={styles.feedVerifiedIcon}>
+                <Feather name="check-circle" size={16} color="#0001FF" />
+              </View>
+            )}
+          </View>
+          <Text style={styles.feedTime}>{post.time}</Text>
+        </View>
+        <TouchableOpacity style={styles.feedMoreBtn}>
+          <Feather name="more-horizontal" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Post Image - Directly under the header */}
+      {post.image && (
+        <View style={styles.feedImageContainer}>
+          <Image 
+            source={{ uri: post.image }} 
+            style={styles.feedImage}
+            resizeMode="cover"
+          />
+        </View>
+      )}
+
+      {/* Content */}
+      <Text style={styles.feedContent}>
+        {post.content}
+      </Text>
+
+      {/* Plan Card */}
+      {post.isPlan && post.plan && (
+        <View style={styles.planCard}>
+          <View style={styles.planHeader}>
+            <Text style={styles.planTitle}>
+              {post.plan.title} - {post.plan.price}
+            </Text>
+          </View>
+          <Text style={styles.planDescription}>
+            {post.plan.description}
+          </Text>
+          <View style={styles.planActions}>
+            <TouchableOpacity style={styles.planViewBtn}>
+              <Text style={styles.planViewText}>View</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Actions - Like and Comment */}
+      <View style={styles.feedActions}>
+        <TouchableOpacity 
+          onPress={handleLike}
+          style={styles.feedActionBtn}
+        >
+          <Feather 
+            name="heart" 
+            size={20} 
+            color={liked ? "#EF4444" : "#9CA3AF"} 
+            fill={liked ? "#EF4444" : "none"}
+          />
+          <Text style={[styles.feedActionText, liked && styles.feedActionTextLiked]}>
+            {likesCount}
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.feedActionBtn}>
+          <Feather name="message-circle" size={20} color="#9CA3AF" />
+          <Text style={styles.feedActionText}>{post.comments}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 // ─── Filter Modal ─────────────────────────────────────────────────────────────
 function FilterModal({
   visible,
@@ -84,7 +237,7 @@ function FilterModal({
     setLocal((prev) => ({
       ...prev,
       interests: prev.interests.includes(i)
-        ? prev.interests.filter((x) => x !== i)
+        ? prev.interests.filter((x: string) => x !== i)
         : [...prev.interests, i],
     }));
 
@@ -280,6 +433,7 @@ export default function MatchingHomeScreen() {
   const [spotlightModalOpen, setSpotlightModalOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState<FilterState>(DEFAULT_FILTER);
+  const [composerText, setComposerText] = useState("");
 
   const profile = mockProfiles[currentIndex];
   const greeting = getTimeGreeting();
@@ -314,9 +468,9 @@ export default function MatchingHomeScreen() {
         </View>
 
         {/* Header */}
-        <View style={styles.ptHeaderCenter}>
-          <Text style={styles.ptBrandTitle}>Gym+1</Text>
-          <Text style={styles.ptBrandSub}>Match your workout vibe</Text>
+       <View className="items-center font-author mt-12">
+          {/* <GymIcon width={100} height={39} /> */}
+          <Image source={require("@/assets/logo-hm.png")} width={100} height={39} />
         </View>
 
         <View style={styles.headerRow}>
@@ -350,7 +504,7 @@ export default function MatchingHomeScreen() {
         </View>
 
         {/* Filter button row */}
-        <View style={styles.filterRow} className="bg-black">
+        <View style={styles.filterRow}>
           <Pressable style={styles.filterBtn} onPress={() => setFilterOpen(true)}>
             <FilterIconCustom size={30} />
           </Pressable>
@@ -398,7 +552,7 @@ export default function MatchingHomeScreen() {
 
             <Text style={styles.sectionTitle}>Interests</Text>
             <View style={styles.chipsContainer}>
-              {profile.interests.map((interest, idx) => (
+              {profile.interests.map((interest: string, idx: number) => (
                 <View key={idx} style={styles.chip}>
                   <Text style={styles.chipText}>{interest}</Text>
                 </View>
@@ -428,190 +582,99 @@ export default function MatchingHomeScreen() {
   }
 
   // ── +1 User View ────────────────────────────────────────────────────────────
-  return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: 100 }]}>
-      {/* Header brand */}
-      <View style={styles.ptHeaderCenter}>
-        <Text style={styles.ptBrandTitle}>Gym+1</Text>
-        <Text style={styles.ptBrandSub}>Match your workout vibe</Text>
-      </View>
-
-      <View style={styles.headerRow}>
-        <View style={styles.headerLeft}>
-          <Image source={USER_AVATAR_PLACEHOLDER} style={styles.userAvatar} />
-          <View style={styles.headerTextCol}>
-            <Text style={styles.helloLine}>Hello, Jennie</Text>
-            <Text style={styles.greetingLine}>
-              {greeting.label} {greeting.emoji}
-            </Text>
-            <View style={styles.headerBadgeRow}>
-              <Pressable
-                onPress={() => setSpotlightModalOpen(true)}
-                style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
-              >
-                <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Spotlight</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setSuperModalOpen(true)}
-                style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
-              >
-                <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Super +1</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-        <View style={styles.headerRight}>
-          <Pressable style={styles.headerIconBtn}>
-            <View style={styles.headerIconWrap}>
-              <Ionicons name="notifications" size={18} color="#fff" />
-              <View style={styles.notificationBadge} />
-            </View>
-          </Pressable>
-          <Pressable style={styles.headerIconBtn}>
-            <Ionicons name="settings-sharp" size={18} color="#fff" />
-          </Pressable>
-        </View>
-      </View>
-   <View className="flex justify-right w-full ml-auto">
-          <button>
-
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M26.6254 9.47461H19.6504C19.1629 9.47461 18.7754 9.08711 18.7754 8.59961C18.7754 8.11211 19.1629 7.72461 19.6504 7.72461H26.6254C27.1129 7.72461 27.5004 8.11211 27.5004 8.59961C27.5004 9.08711 27.1129 9.47461 26.6254 9.47461Z" fill="url(#paint0_radial_2576_31301)" />
-              <path d="M8.025 9.47461H3.375C2.8875 9.47461 2.5 9.08711 2.5 8.59961C2.5 8.11211 2.8875 7.72461 3.375 7.72461H8.025C8.5125 7.72461 8.9 8.11211 8.9 8.59961C8.9 9.08711 8.5 9.47461 8.025 9.47461Z" fill="url(#paint1_radial_2576_31301)" />
-              <path d="M12.6748 13.5371C15.4017 13.5371 17.6123 11.3265 17.6123 8.59961C17.6123 5.8727 15.4017 3.66211 12.6748 3.66211C9.9479 3.66211 7.7373 5.8727 7.7373 8.59961C7.7373 11.3265 9.9479 13.5371 12.6748 13.5371Z" fill="url(#paint2_radial_2576_31301)" />
-              <path d="M26.6246 22.2627H21.9746C21.4871 22.2627 21.0996 21.8752 21.0996 21.3877C21.0996 20.9002 21.4871 20.5127 21.9746 20.5127H26.6246C27.1121 20.5127 27.4996 20.9002 27.4996 21.3877C27.4996 21.8752 27.1121 22.2627 26.6246 22.2627Z" fill="url(#paint3_radial_2576_31301)" />
-              <path d="M10.35 22.2627H3.375C2.8875 22.2627 2.5 21.8752 2.5 21.3877C2.5 20.9002 2.8875 20.5127 3.375 20.5127H10.35C10.8375 20.5127 11.225 20.9002 11.225 21.3877C11.225 21.8752 10.825 22.2627 10.35 22.2627Z" fill="url(#paint4_radial_2576_31301)" />
-              <path d="M17.3252 26.3379C20.0521 26.3379 22.2627 24.1273 22.2627 21.4004C22.2627 18.6735 20.0521 16.4629 17.3252 16.4629C14.5983 16.4629 12.3877 18.6735 12.3877 21.4004C12.3877 24.1273 14.5983 26.3379 17.3252 26.3379Z" fill="#0001FF" />
-              <defs>
-                <radialGradient id="paint0_radial_2576_31301" cx="0" cy="0" r="1" gradientTransform="matrix(-7.65974 1.70494 -8.50032 -0.327033 27.1859 7.74432)" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0001FF" />
-                  <stop offset="0.333333" stop-color="#1819CB" />
-                  <stop offset="0.763585" stop-color="#050269" />
-                  <stop offset="1" stop-color="#020050" />
-                </radialGradient>
-                <radialGradient id="paint1_radial_2576_31301" cx="0" cy="0" r="1" gradientTransform="matrix(-5.6186 1.70494 -6.23519 -0.327033 8.6693 7.74432)" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0001FF" />
-                  <stop offset="0.333333" stop-color="#1819CB" />
-                  <stop offset="0.763585" stop-color="#050269" />
-                  <stop offset="1" stop-color="#020050" />
-                </radialGradient>
-                <radialGradient id="paint2_radial_2576_31301" cx="0" cy="0" r="1" gradientTransform="matrix(-8.66933 9.62071 -9.62071 -1.8454 17.2563 3.77336)" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0001FF" />
-                  <stop offset="0.333333" stop-color="#1819CB" />
-                  <stop offset="0.763585" stop-color="#050269" />
-                  <stop offset="1" stop-color="#020050" />
-                </radialGradient>
-                <radialGradient id="paint3_radial_2576_31301" cx="0" cy="0" r="1" gradientTransform="matrix(-5.6186 1.70494 -6.23519 -0.327033 27.2689 20.5324)" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0001FF" />
-                  <stop offset="0.333333" stop-color="#1819CB" />
-                  <stop offset="0.763585" stop-color="#050269" />
-                  <stop offset="1" stop-color="#020050" />
-                </radialGradient>
-                <radialGradient id="paint4_radial_2576_31301" cx="0" cy="0" r="1" gradientTransform="matrix(-7.65974 1.70494 -8.50032 -0.327033 10.9105 20.5324)" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0001FF" />
-                  <stop offset="0.333333" stop-color="#1819CB" />
-                  <stop offset="0.763585" stop-color="#050269" />
-                  <stop offset="1" stop-color="#020050" />
-                </radialGradient>
-              </defs>
-            </svg>
-
-          </button>
-
-        </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.imageContainer}>
-          <View style={styles.imageWrapper}>
-            <Image source={{ uri: profile.mainImage }} style={styles.mainImage} />
-            <View style={styles.imageOverlay} />
-          </View>
-          <View style={styles.plusOneBadge}>
-            <Text style={styles.plusOneBadgeText}>+1</Text>
-          </View>
+ // ── +1 User View ────────────────────────────────────────────────────────────
+return (
+  <View style={[styles.container, { paddingTop: insets.top }]}>
+    <ScrollView 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 80 }}
+    >
+      {/* Header - Everything inside ScrollView now */}
+      <View style={styles.headerContainer}>
+        {/* Brand */}
+         <View className="items-center font-author mt-8">
+          <Text className="text-black text-4xl italic font-bold">Gym+1</Text>
+          <Text className="text-black font-[375] text-md italic">Match your workout vibe</Text>
         </View>
 
-        <View style={styles.actionButtonsRow}>
-          <Pressable style={[styles.actionBtn, { width: 50, height: 50 }]} onPress={handleNext}>
-            <Feather name="x" size={24} color="#0001FF" />
-          </Pressable>
-          <Pressable style={[styles.actionBtn, { width: 64, height: 64 }]} onPress={handlePowerLike}>
-            <Ionicons name="flash" size={32} color="#FFD700" />
-          </Pressable>
-          <Pressable style={[styles.actionBtn, { width: 50, height: 50 }]} onPress={handleLike}>
-            <FontAwesome name="check" size={24} color="#0001FF" />
-          </Pressable>
-        </View>
-
-        <View style={styles.infoSection}>
-          <View style={styles.locationRow}>
-            <Feather name="map-pin" size={14} color="#555" />
-            <Text style={styles.locationText}>{profile.location}</Text>
-          </View>
-          <Text style={styles.nameAge}>{profile.name}, {profile.age}</Text>
-          <Text style={styles.distanceText}>{profile.distance}</Text>
-
-          <Text style={styles.sectionTitle}>Bio</Text>
-          <Text style={styles.bioText}>{profile.bio}</Text>
-
-          <Text style={styles.sectionTitle}>Interests</Text>
-          <View style={styles.chipsContainer}>
-            {profile.interests.map((interest, idx) => (
-              <View key={idx} style={styles.chip}>
-                <Text style={styles.chipText}>{interest}</Text>
+        {/* Profile Section */}
+        <View style={styles.headerRow} className="">
+          <View style={styles.headerLeft}>
+            <Image source={jennieImg} style={styles.userAvatar} />
+            <View style={styles.headerTextCol}>
+              <Text style={styles.helloLine}>Hello, Jennie</Text>
+              <Text style={styles.greetingLine}>
+                {greeting.label} {greeting.emoji}
+              </Text>
+              <View style={styles.headerBadgeRow}>
+                <Pressable
+                  onPress={() => setSpotlightModalOpen(true)}
+                  style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
+                >
+                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Spotlight</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setSuperModalOpen(true)}
+                  style={[styles.headerBadge, { backgroundColor: "#0001FF" }]}
+                >
+                  <Text style={[styles.headerBadgeText, { color: "#fff" }]}>Super +1</Text>
+                </Pressable>
               </View>
-            ))}
+            </View>
           </View>
-
-          <Text style={styles.sectionTitle}>Experience</Text>
-          <Text style={styles.bioText}>{profile.experience}</Text>
-
-          <Text style={styles.sectionTitle}>Ethnicity</Text>
-          <Text style={styles.bioText}>{profile.ethnicity}</Text>
-
-          <Text style={styles.sectionTitle}>Fitness Activity per week</Text>
-          <Text style={styles.bioText}>{profile.activityPerWeek}</Text>
-
-          <View style={styles.extraPhotoContainer}>
-            <Image source={profile.workoutPlansImage} style={styles.extraPhoto} />
-          </View>
-          <Text style={styles.extraPhotoDesc}>
-            I've been skydiving, I can juggle, and I've climbed Mt. Everest.
-          </Text>
-
-          <View style={styles.extraPhotoContainer}>
-            <Image source={profile.weightLossImage} style={styles.extraPhoto} />
-          </View>
-          <Text style={styles.extraPhotoDesc}>
-            Starts with a good cup of coffee, a walk in the park, and ends with a movie marathon.
-          </Text>
-
-          <Text style={styles.sectionTitle}>Workout Plans</Text>
-          <View style={styles.extraPhotoContainer}>
-            <Image source={{ uri: profile.mainImage }} style={styles.extraPhoto} />
-          </View>
-
-          <Text style={styles.sectionTitle}>Weight Loss</Text>
-          <Text style={styles.bioText}>Plans focused on burning calories and reducing body fat.</Text>
-          <View style={styles.extraPhotoContainer}>
-            <Image source={{ uri: profile.workoutPlansImage }} style={styles.extraPhoto} />
+          
+          <View style={styles.headerRight}>
+            <Pressable style={styles.headerIconBtn}>
+              <View style={styles.headerIconWrap}>
+                <Ionicons name="notifications" size={18} color="#fff" />
+                <View style={styles.notificationBadge} />
+              </View>
+            </Pressable>
+            <Pressable style={styles.headerIconBtn}>
+              <Ionicons name="settings-sharp" size={18} color="#fff" />
+            </Pressable>
           </View>
         </View>
-      </ScrollView>
 
-      <PremiumPaymentModal
-        visible={superModalOpen}
-        mode="super"
-        onClose={() => setSuperModalOpen(false)}
-        onSuccess={() => setSuperModalOpen(false)}
-      />
-      <PremiumPaymentModal
-        visible={spotlightModalOpen}
-        mode="spotlight"
-        onClose={() => setSpotlightModalOpen(false)}
-        onSuccess={() => setSpotlightModalOpen(false)}
-      />
-    </View>
-  );
+        {/* Composer with avatar inside */}
+        <View style={styles.composerContainer} className="">
+          <View style={styles.composerWrapper}>
+            <Image source={jennieImg} style={styles.composerAvatar} />
+            <TextInput
+              value={composerText}
+              onChangeText={setComposerText}
+              placeholder="What's on your mind?"
+              placeholderTextColor="#9CA3AF"
+              style={styles.composerInput}
+              multiline
+            />
+            <TouchableOpacity>
+              <Feather name="image" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      {/* Feed Posts */}
+      {MOCK_FEED.map((post) => (
+        <FeedPost key={post.id} post={post} />
+      ))}
+    </ScrollView>
+
+    <PremiumPaymentModal
+      visible={superModalOpen}
+      mode="super"
+      onClose={() => setSuperModalOpen(false)}
+      onSuccess={() => setSuperModalOpen(false)}
+    />
+    <PremiumPaymentModal
+      visible={spotlightModalOpen}
+      mode="spotlight"
+      onClose={() => setSpotlightModalOpen(false)}
+      onSuccess={() => setSpotlightModalOpen(false)}
+    />
+  </View>
+);
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
@@ -621,7 +684,7 @@ const styles = StyleSheet.create({
 
   // PT top bar (back button)
   ptTopBar: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingTop: 4,
     paddingBottom: 4,
   },
@@ -634,15 +697,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  // Header styles (now part of scroll content)
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
   ptHeaderCenter: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 2,
   },
   ptBrandTitle: {
-    fontSize: 22,
+    fontSize: 36,
     fontWeight: "900",
     fontStyle: "italic",
+    fontFamily:"author",
     color: "#000",
   },
   ptBrandSub: {
@@ -655,7 +724,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 4,
     paddingTop: 10,
     paddingBottom: 6,
   },
@@ -700,6 +769,160 @@ const styles = StyleSheet.create({
     borderColor: "#000",
   },
 
+  // Composer styles
+  composerContainer: {
+    paddingHorizontal: 4,
+    marginBottom: 8,
+  },
+  composerWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    height: 44, // Fixed height of 44px
+  },
+  composerAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    marginRight: 10,
+  },
+  composerInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#111827",
+    paddingVertical: 4,
+    fontFamily: "Manrope",
+    height: 36,
+  },
+
+  // Feed styles - updated with image container
+  feedItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  feedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  feedAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  feedUserInfo: {
+    flex: 1,
+  },
+  feedUserNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  feedUserName: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111827",
+    fontFamily: "Manrope",
+  },
+  feedVerifiedIcon: {
+    marginLeft: 4,
+  },
+  feedTime: {
+    fontSize: 12,
+    color: "#9CA3AF",
+    fontFamily: "Manrope",
+    marginTop: 1,
+  },
+  feedMoreBtn: {
+    padding: 4,
+  },
+  // Post image container - directly under header
+  feedImageContainer: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 12,
+    backgroundColor: "#F3F4F6",
+  },
+  feedImage: {
+    width: "100%",
+    height: "100%",
+  },
+  feedContent: {
+    fontSize: 14,
+    color: "#1F2937",
+    lineHeight: 20,
+    fontFamily: "Manrope",
+    marginBottom: 12,
+  },
+  feedActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  feedActionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 24,
+  },
+  feedActionText: {
+    fontSize: 14,
+    color: "#9CA3AF",
+    fontFamily: "Manrope",
+    marginLeft: 4,
+  },
+  feedActionTextLiked: {
+    color: "#EF4444",
+  },
+  planCard: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
+  },
+  planHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  planTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111827",
+    fontFamily: "Manrope",
+  },
+  planDescription: {
+    fontSize: 13,
+    color: "#6B7280",
+    fontFamily: "Manrope",
+    marginBottom: 12,
+  },
+  planActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  planViewBtn: {
+    backgroundColor: "#0001FF",
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  planViewText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "600",
+    fontFamily: "Manrope",
+  },
+
   // Filter row (right-aligned)
   filterRow: {
     paddingHorizontal: 20,
@@ -712,7 +935,10 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
+  scrollContent: { 
+    paddingHorizontal: 20, 
+    paddingBottom: 40 
+  },
 
   imageContainer: {
     alignItems: "center",
@@ -775,7 +1001,7 @@ const styles = StyleSheet.create({
   infoSection: { paddingHorizontal: 10 },
   locationRow: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 4 },
   locationText: { fontSize: 12, color: "#555", fontWeight: "600" },
-  nameAge: { fontSize: 28, fontWeight: "800", color: "#000", marginBottom: 2 },
+  nameAge: { fontSize: 28, fontWeight: "500", color: "#000", marginBottom: 2 },
   distanceText: { fontSize: 12, color: "#888", marginBottom: 20 },
   sectionTitle: { fontSize: 16, fontWeight: "800", color: "#000", marginTop: 20, marginBottom: 8 },
   bioText: { fontSize: 14, color: "#555", lineHeight: 22 },
