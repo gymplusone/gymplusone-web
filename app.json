@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gymplusone.gymplusone",
+"bundleIdentifier": "com.gymplusone.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people.",
@@ -24,17 +24,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-<<<<<<< HEAD
-        "android.permission.RECORD_AUDIO"
-=======
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT"
->>>>>>> 9b9651ef8b6e3e29ddb658467045de231c68043f
-      ],
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.gymplusone.gymplusone"
     },
     "web": {
@@ -55,8 +45,7 @@
       [
         "@rnmapbox/maps",
         {
-          "RNMapboxMapsVersion": "11.8.0",
-          "RNMapboxMapsDownloadToken": "REPLACE_WITH_YOUR_MAPBOX_SECRET_TOKEN"
+          "RNMapboxMapsVersion": "11.8.0"
         }
       ],
       [
@@ -73,7 +62,8 @@
       "router": {},
       "eas": {
         "projectId": "9632c19a-6dbd-4c75-b34c-6b134cd52a7d"
-      }
+      },
+      "mapboxAccessToken": "pk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtNzIyOTY1djA1aGYybHIzaXE1eG5odTcifQ.Esxl0GXlX91G4919X0bnGg"
     },
     "owner": "devtoby"
   }

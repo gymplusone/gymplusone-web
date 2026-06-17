@@ -1,0 +1,23 @@
+{
+  "name": "Gym+1",
+  "short_name": "Gym+1",
+  "description": "Match your workout vibe",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0001FF",
+  "orientation": "portrait",
+  "version": "1.0.1",
+  "icons": [
+  {
+    "src": "/assets/images/logo.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "/assets/images/logo.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
+}
