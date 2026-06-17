@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gymplusone.gymplusone",
+"bundleIdentifier": "com.gymplusone.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people.",
