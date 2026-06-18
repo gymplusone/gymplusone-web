@@ -6,16 +6,37 @@ workflows:
 
     environment:
       node: 18
+      groups:
+        - credentials # This links your Codemagic web dashboard environment variables here
+      vars:
+        # Fallback to make sure Expo knows it's running in a non-interactive CI environment
+        CI: "true"
 
     scripts:
       - name: Install dependencies
         script: npm install
 
-      - name: Install EAS CLI
-        script: npm install -g eas-cli
+      - name: Generate Native iOS Project
+        script: |
+          # This configures your native project code without trying to run local pods
+          npx expo prebuild --platform ios --no-install
 
-      - name: Build with EAS
-        script: eas build -p ios --non-interactive
+      - name: Install CocoaPods Remotely
+        script: |
+          # Codemagic will download the Mapbox SDK binary using your token variable here
+          cd ios && pod install
+
+      - name: Compile Standalone Development App
+        script: |
+          # This compiles the workspace directly into an installable application bundle
+          xcodebuild -workspace ios/gym1111.xcworkspace \
+                     -scheme gym1111 \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -archivePath $CM_BUILD_DIR/ios/gym1111.xcarchive \
+                     archive \
+                     CODE_SIGNING_ALLOWED=NO
 
     artifacts:
-      - "*.ipa"
+      - $CM_BUILD_DIR/ios/*.xcarchive
+      - ios/build/**/*.app
