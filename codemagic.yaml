@@ -5,7 +5,7 @@ workflows:
     instance_type: mac_mini_m1
 
     environment:
-      node: 20  # <--- Update this from 18 to 20
+      node: 20
       groups:
         - credentials
       vars:
@@ -25,11 +25,12 @@ workflows:
 
       - name: Compile Standalone Development App
         script: |
-          xcodebuild -workspace ios/gym1111.xcworkspace \
-                     -scheme gym1111 \
+          # Changed workspace and scheme paths to match gymplusone
+          xcodebuild -workspace ios/gymplusone.xcworkspace \
+                     -scheme gymplusone \
                      -configuration Release \
                      -sdk iphoneos \
-                     -archivePath $CM_BUILD_DIR/ios/gym1111.xcarchive \
+                     -archivePath $CM_BUILD_DIR/ios/gymplusone.xcarchive \
                      archive \
                      CODE_SIGNING_ALLOWED=NO
 
