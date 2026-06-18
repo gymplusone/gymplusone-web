@@ -12,7 +12,11 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EAS_NO_FROZEN_LOCKFILE": "1",
+        "RNMAPBOX_MAPS_DOWNLOAD_TOKEN": "sk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtcWlsM3NpYjA0czcycXNkYnhpM3IxeWoifQ.z3K2AfqYDFzZxq82tqG56w"
+      }
     }
   },
   "submit": {

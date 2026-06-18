@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gymplusone.gymplusone",
+"bundleIdentifier": "com.gymplusone.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Gym+1 uses your location to show you nearby workouts, events, and people.",
@@ -51,8 +51,14 @@
       [
         "@rnmapbox/maps",
         {
+<<<<<<< HEAD
           "RNMapboxMapsVersion": "11.8.0",
           "RNMapboxMapsDownloadToken": "REPLACE_WITH_YOUR_MAPBOX_SECRET_TOKEN"
+=======
+          "RNMapboxMapsImpl": "mapbox",
+          "RNMapboxMapsVersion": "11.8.0",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtcWlsM3NpYjA0czcycXNkYnhpM3IxeWoifQ.z3K2AfqYDFzZxq82tqG56w"
+>>>>>>> fb190c73683a7901de4e95fb6e27d713c7ca48fd
         }
       ],
       [

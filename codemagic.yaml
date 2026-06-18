@@ -1,0 +1,43 @@
+workflows:
+  ios-workflow:
+    name: Expo iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+
+    environment:
+      node: 20
+      groups:
+        - credentials
+      vars:
+        CI: "true"
+
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Generate Native iOS Project
+        script: |
+          npx expo prebuild --platform ios --no-install
+
+      - name: Install CocoaPods Remotely
+        script: |
+          # Explicitly pass the download token to the pod installer
+          export RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtcWlsM3NpYjA0czcycXNkYnhpM3IxeWoifQ.z3K2AfqYDFzZxq82tqG56w
+          cd ios && pod install
+
+      - name: Compile Standalone Development App
+        script: |
+          # Explicitly pass the download token to the Xcode compiler toolchain
+          export RNMAPBOX_MAPS_DOWNLOAD_TOKEN=sk.eyJ1Ijoib290aXMxNTY5IiwiYSI6ImNtcWlsM3NpYjA0czcycXNkYnhpM3IxeWoifQ.z3K2AfqYDFzZxq82tqG56w
+          
+          xcodebuild -workspace ios/gymplusone.xcworkspace \
+                     -scheme gymplusone \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -archivePath $CM_BUILD_DIR/ios/gymplusone.xcarchive \
+                     archive \
+                     CODE_SIGNING_ALLOWED=NO
+
+    artifacts:
+      - $CM_BUILD_DIR/ios/*.xcarchive
+      - ios/build/**/*.app
