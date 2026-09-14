@@ -860,6 +860,7 @@ function Navbar({ theme, onToggleTheme, onNavigate, currentView, setView, curren
       >
         FAQ
       </button>
+      <a href="/games" className="rounded-full px-3 py-1 text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-50">Games</a>
     </>
   );
 
